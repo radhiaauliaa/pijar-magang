@@ -119,7 +119,7 @@ export function MahasiswaDashboard() {
       })()}
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
         <StatCard
           title="Total Jurnal"
           value={stats?.total_jurnal ?? 0}

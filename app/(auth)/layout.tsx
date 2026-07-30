@@ -61,20 +61,20 @@ function AuthContent({ children }: { children: React.ReactNode }) {
       {/* Right Panel: Independent scrollable container for forms */}
       <div className="flex-1 min-h-screen lg:min-h-0 lg:h-full bg-slate-50/60 dark:bg-slate-950 flex flex-col justify-start items-center p-4 sm:p-6 md:p-8 relative overflow-y-auto">
         {/* Top Header for Mobile */}
-        <div className="w-full max-w-md flex items-center justify-between pt-2 pb-4 lg:hidden">
+        <div className="w-full max-w-md flex items-center justify-between pt-3 pb-6 mb-2 lg:hidden border-b border-slate-200/60 dark:border-slate-800/60">
           <button
             type="button"
             onClick={handleBackClick}
-            className="w-9 h-9 rounded-xl bg-[#14355D] hover:bg-[#0F2A4A] text-white flex items-center justify-center transition-all shadow-md group"
+            className="w-10 h-10 rounded-xl bg-[#14355D] hover:bg-[#0F2A4A] text-white flex items-center justify-center transition-all shadow-md group shrink-0"
             title="Kembali"
           >
-            <ArrowLeft className="w-4.5 h-4.5 group-hover:-translate-x-0.5 transition-transform" />
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
           <div className="flex items-center gap-2.5">
-            <img src="/logo-pln2.png" alt="Logo PLN" className="h-8 w-auto object-contain shrink-0" />
+            <img src="/logo-pln2.png" alt="Logo PLN" className="h-8.5 w-auto object-contain shrink-0" />
             <div>
-              <span className="text-base font-black text-[#103956] leading-none block">PIJAR</span>
-              <span className="text-[10px] font-bold text-sky-600 leading-none block">PLN UP3 Padang</span>
+              <span className="text-base font-black text-[#103956] dark:text-white leading-none block">PIJAR</span>
+              <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400 leading-none block">PLN UP3 Padang</span>
             </div>
           </div>
         </div>

@@ -23,14 +23,14 @@ export function StatCard({
 }: StatCardProps) {
   if (loading) {
     return (
-      <Card className="overflow-hidden">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
+      <Card className="overflow-hidden rounded-2xl">
+        <CardContent className="p-3.5 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="space-y-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-3 w-16 sm:w-24" />
+              <Skeleton className="h-6 w-12 sm:h-8 sm:w-16" />
             </div>
-            <Skeleton className="h-12 w-12 rounded-xl" />
+            <Skeleton className="h-9 w-9 sm:h-12 sm:w-12 rounded-xl" />
           </div>
         </CardContent>
       </Card>
@@ -38,18 +38,18 @@ export function StatCard({
   }
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-200 group">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground font-medium">{title}</p>
-            <p className="text-3xl font-bold mt-1 tracking-tight">
-              {value.toLocaleString("id-ID")}
+    <Card className="overflow-hidden hover:shadow-md transition-all duration-200 group rounded-2xl">
+      <CardContent className="p-3.5 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="order-2 sm:order-1">
+            <p className="text-xs sm:text-sm text-muted-foreground font-semibold line-clamp-1">{title}</p>
+            <p className="text-xl sm:text-3xl font-extrabold mt-0.5 sm:mt-1 tracking-tight text-foreground">
+              {typeof value === "number" ? value.toLocaleString("id-ID") : value}
             </p>
             {trend && (
               <p
                 className={cn(
-                  "text-xs mt-1 font-medium",
+                  "text-[10px] sm:text-xs mt-0.5 font-medium",
                   trend.value >= 0 ? "text-emerald-600" : "text-red-500"
                 )}
               >
@@ -59,11 +59,11 @@ export function StatCard({
           </div>
           <div
             className={cn(
-              "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200",
+              "w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-200 shrink-0 order-1 sm:order-2 self-start sm:self-auto",
               colorClass
             )}
           >
-            <Icon className="w-6 h-6 text-white" />
+            <Icon className="w-4.5 h-4.5 sm:w-6 sm:h-6 text-white" />
           </div>
         </div>
       </CardContent>

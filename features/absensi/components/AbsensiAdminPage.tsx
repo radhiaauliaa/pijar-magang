@@ -28,6 +28,14 @@ export function AbsensiAdminPage() {
   const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth()); // 0-indexed
   const [search, setSearch] = useState("");
+  const [mobileShowAllDays, setMobileShowAllDays] = useState(false);
+
+  const todayDay = useMemo(() => {
+    if (selectedYear === now.getFullYear() && selectedMonth === now.getMonth()) {
+      return now.getDate();
+    }
+    return 1;
+  }, [selectedYear, selectedMonth]);
 
   const { data: mhsResponse, isLoading: isMhsLoading } = useQuery({
     queryKey: ["mahasiswa", 1, 500],
@@ -272,75 +280,210 @@ export function AbsensiAdminPage() {
           </div>
         </div>
 
+        {/* Mobile View Mode Toggle */}
+        <div className="flex md:hidden items-center justify-between gap-2 pb-1">
+          <div className="text-xs font-semibold text-muted-foreground">
+            {mobileShowAllDays ? "Menampilkan semua tanggal (1-31)" : `Absensi Hari Ini: ${todayDay} ${MONTH_NAMES[selectedMonth]}`}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-[11px] px-2.5 rounded-lg border-border font-bold text-sky-700 dark:text-sky-400 shrink-0"
+            onClick={() => setMobileShowAllDays(!mobileShowAllDays)}
+          >
+            {mobileShowAllDays ? "📱 Tampilkan Hari Ini" : "📊 Lihat Semua (1-31)"}
+          </Button>
+        </div>
+
         {/* Matrix Table */}
         {isLoading ? (
           <div className="py-12 text-center text-sm text-muted-foreground">Memuat rekap absensi...</div>
         ) : filteredStudents.length === 0 ? (
           <EmptyState title="Belum ada mahasiswa" description="Data mahasiswa akan muncul di sini" />
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-border">
-            <table className="w-full text-xs text-left border-collapse min-w-[800px]">
-              <thead>
-                <tr className="bg-muted/60 border-b border-border font-bold text-foreground">
-                  <th rowSpan={2} className="p-3 w-12 text-center border-r border-border align-middle sticky left-0 z-20 bg-muted">No</th>
-                  <th rowSpan={2} className="p-3 min-w-[180px] border-r-2 border-border align-middle sticky left-12 z-20 bg-muted shadow-xs">Nama Mahasiswa</th>
-                  <th colSpan={daysInMonth} className="p-2 text-center border-b border-border">
-                    Hari ({MONTH_NAMES[selectedMonth]} {selectedYear})
-                  </th>
-                </tr>
-                <tr className="bg-muted/30 border-b border-border text-center font-bold text-muted-foreground">
-                  {daysArray.map((day) => (
-                    <th key={day} className="p-1.5 w-9 border-r border-border min-w-[32px]">
-                      {String(day).padStart(2, "0")}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredStudents.map((mhs, idx) => (
-                  <tr key={mhs.id} className="border-b border-border hover:bg-muted/20 transition-colors">
-                    <td className="p-2.5 text-center font-medium border-r border-border sticky left-0 z-10 bg-card">{idx + 1}</td>
-                    <td className="p-2.5 font-bold text-foreground border-r-2 border-border whitespace-nowrap sticky left-12 z-10 bg-card shadow-xs">
-                      {mhs.nama}
-                    </td>
-                    {daysArray.map((day) => {
-                      const att = getAttendanceForDay(mhs, day);
-                      if (!att) {
-                        return (
-                          <td key={day} className="p-1.5 text-center text-muted-foreground/40 border-r border-border">
-                            -
-                          </td>
-                        );
-                      }
+          <div>
+            {/* Mobile Today-Only Table (< md, default when !mobileShowAllDays) */}
+            {!mobileShowAllDays && (
+              <div className="block md:hidden overflow-hidden rounded-xl border border-border">
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr className="bg-muted/60 border-b border-border font-bold text-foreground">
+                      <th className="p-2.5 w-10 text-center border-r border-border">No</th>
+                      <th className="p-2.5 border-r border-border">Nama Mahasiswa</th>
+                      <th className="p-2.5 text-center w-28">Status ({todayDay} {MONTH_NAMES[selectedMonth].slice(0, 3)})</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredStudents.map((mhs, idx) => {
+                      const att = getAttendanceForDay(mhs, todayDay);
+                      let cellBadge = <span className="text-muted-foreground/60 font-medium">-</span>;
 
-                      const st = String(att.status || "").toLowerCase();
-                      let cellColor = "text-foreground font-medium";
-                      let textLabel = "Hadir";
-
-                      if (st === "hadir") {
-                        cellColor = "text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10";
-                        textLabel = "Hadir";
-                      } else if (st === "terlambat") {
-                        cellColor = "text-amber-700 dark:text-amber-400 font-bold bg-amber-500/10";
-                        textLabel = "Terlambat";
-                      } else if (st === "izin" || st === "sakit") {
-                        cellColor = "text-blue-700 dark:text-blue-400 font-bold bg-blue-500/10";
-                        textLabel = att.jenis_izin === "Sakit" ? "Sakit" : "Izin";
-                      } else if (st === "alpha") {
-                        cellColor = "text-red-700 dark:text-red-400 font-bold bg-red-500/10";
-                        textLabel = "Alpha";
+                      if (att) {
+                        const st = String(att.status || "").toLowerCase();
+                        if (st === "hadir") {
+                          cellBadge = <span className="inline-block px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-[11px]">Hadir</span>;
+                        } else if (st === "terlambat") {
+                          cellBadge = <span className="inline-block px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 font-bold text-[11px]">Terlambat</span>;
+                        } else if (st === "izin" || st === "sakit") {
+                          cellBadge = <span className="inline-block px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-700 dark:text-blue-400 font-bold text-[11px]">{att.jenis_izin === "Sakit" ? "Sakit" : "Izin"}</span>;
+                        } else if (st === "alpha") {
+                          cellBadge = <span className="inline-block px-2 py-0.5 rounded-md bg-red-500/10 text-red-700 dark:text-red-400 font-bold text-[11px]">Alpha</span>;
+                        }
                       }
 
                       return (
-                        <td key={day} className={`p-1 text-center border-r border-border text-[11px] ${cellColor}`} title={`${formatDate(att.tanggal)}: ${textLabel}`}>
-                          {textLabel}
-                        </td>
+                        <tr key={mhs.id} className="border-b border-border hover:bg-muted/20 transition-colors">
+                          <td className="p-2.5 text-center font-medium border-r border-border">{idx + 1}</td>
+                          <td className="p-2.5 border-r border-border">
+                            <p className="font-bold text-foreground leading-tight">{mhs.nama}</p>
+                            <p className="text-[10px] text-muted-foreground">{mhs.universitas || mhs.nim}</p>
+                          </td>
+                          <td className="p-2.5 text-center">
+                            {cellBadge}
+                          </td>
+                        </tr>
                       );
                     })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Desktop Full Table (Or Mobile when mobileShowAllDays = true) */}
+            {(mobileShowAllDays || typeof window === "undefined") && (
+              <div className="hidden md:block overflow-x-auto rounded-xl border border-border">
+                <table className="w-full text-xs text-left border-collapse min-w-[800px]">
+                  <thead>
+                    <tr className="bg-muted/60 border-b border-border font-bold text-foreground">
+                      <th rowSpan={2} className="p-3 w-12 text-center border-r border-border align-middle sticky left-0 z-20 bg-muted">No</th>
+                      <th rowSpan={2} className="p-3 min-w-[180px] border-r-2 border-border align-middle sticky left-12 z-20 bg-muted shadow-xs">Nama Mahasiswa</th>
+                      <th colSpan={daysInMonth} className="p-2 text-center border-b border-border">
+                        Hari ({MONTH_NAMES[selectedMonth]} {selectedYear})
+                      </th>
+                    </tr>
+                    <tr className="bg-muted/30 border-b border-border text-center font-bold text-muted-foreground">
+                      {daysArray.map((day) => (
+                        <th key={day} className="p-1.5 w-9 border-r border-border min-w-[32px]">
+                          {String(day).padStart(2, "0")}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredStudents.map((mhs, idx) => (
+                      <tr key={mhs.id} className="border-b border-border hover:bg-muted/20 transition-colors">
+                        <td className="p-2.5 text-center font-medium border-r border-border sticky left-0 z-10 bg-card">{idx + 1}</td>
+                        <td className="p-2.5 font-bold text-foreground border-r-2 border-border whitespace-nowrap sticky left-12 z-10 bg-card shadow-xs">
+                          {mhs.nama}
+                        </td>
+                        {daysArray.map((day) => {
+                          const att = getAttendanceForDay(mhs, day);
+                          if (!att) {
+                            return (
+                              <td key={day} className="p-1.5 text-center text-muted-foreground/40 border-r border-border">
+                                -
+                              </td>
+                            );
+                          }
+
+                          const st = String(att.status || "").toLowerCase();
+                          let cellColor = "text-foreground font-medium";
+                          let textLabel = "Hadir";
+
+                          if (st === "hadir") {
+                            cellColor = "text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10";
+                            textLabel = "Hadir";
+                          } else if (st === "terlambat") {
+                            cellColor = "text-amber-700 dark:text-amber-400 font-bold bg-amber-500/10";
+                            textLabel = "Terlambat";
+                          } else if (st === "izin" || st === "sakit") {
+                            cellColor = "text-blue-700 dark:text-blue-400 font-bold bg-blue-500/10";
+                            textLabel = att.jenis_izin === "Sakit" ? "Sakit" : "Izin";
+                          } else if (st === "alpha") {
+                            cellColor = "text-red-700 dark:text-red-400 font-bold bg-red-500/10";
+                            textLabel = "Alpha";
+                          }
+
+                          return (
+                            <td key={day} className={`p-1 text-center border-r border-border text-[11px] ${cellColor}`} title={`${formatDate(att.tanggal)}: ${textLabel}`}>
+                              {textLabel}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Mobile fallback when mobileShowAllDays = true */}
+            {mobileShowAllDays && (
+              <div className="block md:hidden overflow-x-auto rounded-xl border border-border">
+                <table className="w-full text-xs text-left border-collapse min-w-[800px]">
+                  <thead>
+                    <tr className="bg-muted/60 border-b border-border font-bold text-foreground">
+                      <th rowSpan={2} className="p-3 w-12 text-center border-r border-border align-middle sticky left-0 z-20 bg-muted">No</th>
+                      <th rowSpan={2} className="p-3 min-w-[150px] border-r-2 border-border align-middle sticky left-12 z-20 bg-muted shadow-xs">Nama Mahasiswa</th>
+                      <th colSpan={daysInMonth} className="p-2 text-center border-b border-border">
+                        Hari ({MONTH_NAMES[selectedMonth]} {selectedYear})
+                      </th>
+                    </tr>
+                    <tr className="bg-muted/30 border-b border-border text-center font-bold text-muted-foreground">
+                      {daysArray.map((day) => (
+                        <th key={day} className="p-1.5 w-9 border-r border-border min-w-[32px]">
+                          {String(day).padStart(2, "0")}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredStudents.map((mhs, idx) => (
+                      <tr key={mhs.id} className="border-b border-border hover:bg-muted/20 transition-colors">
+                        <td className="p-2.5 text-center font-medium border-r border-border sticky left-0 z-10 bg-card">{idx + 1}</td>
+                        <td className="p-2.5 font-bold text-foreground border-r-2 border-border whitespace-nowrap sticky left-12 z-10 bg-card shadow-xs">
+                          {mhs.nama}
+                        </td>
+                        {daysArray.map((day) => {
+                          const att = getAttendanceForDay(mhs, day);
+                          if (!att) {
+                            return (
+                              <td key={day} className="p-1.5 text-center text-muted-foreground/40 border-r border-border">
+                                -
+                              </td>
+                            );
+                          }
+
+                          const st = String(att.status || "").toLowerCase();
+                          let cellColor = "text-foreground font-medium";
+                          let textLabel = "Hadir";
+
+                          if (st === "hadir") {
+                            cellColor = "text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10";
+                            textLabel = "Hadir";
+                          } else if (st === "terlambat") {
+                            cellColor = "text-amber-700 dark:text-amber-400 font-bold bg-amber-500/10";
+                            textLabel = "Terlambat";
+                          } else if (st === "izin" || st === "sakit") {
+                            cellColor = "text-blue-700 dark:text-blue-400 font-bold bg-blue-500/10";
+                            textLabel = att.jenis_izin === "Sakit" ? "Sakit" : "Izin";
+                          } else if (st === "alpha") {
+                            cellColor = "text-red-700 dark:text-red-400 font-bold bg-red-500/10";
+                            textLabel = "Alpha";
+                          }
+
+                          return (
+                            <td key={day} className={`p-1 text-center border-r border-border text-[11px] ${cellColor}`} title={`${formatDate(att.tanggal)}: ${textLabel}`}>
+                              {textLabel}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
