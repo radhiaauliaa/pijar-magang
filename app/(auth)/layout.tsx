@@ -18,8 +18,8 @@ function AuthContent({ children }: { children: React.ReactNode }) {
 
   return (
     <main className="min-h-screen lg:h-screen lg:max-h-screen w-full flex flex-col lg:flex-row bg-background overflow-x-hidden lg:overflow-hidden">
-      {/* Left Panel: Fixed to 100vh viewport height, never scrolls or gets cut off */}
-      <div className="lg:w-[45%] xl:w-[42%] h-auto lg:h-full bg-[#14355D] text-white p-8 lg:p-12 flex flex-col justify-between items-start text-left min-h-[380px] shrink-0 relative overflow-hidden select-none">
+      {/* Left Panel: Desktop & Tablet only, hidden on mobile */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[42%] h-full bg-[#14355D] text-white p-8 lg:p-12 flex-col justify-between items-start text-left shrink-0 relative overflow-hidden select-none">
         {/* Background decorative circles */}
         <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/5 pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-white/5 pointer-events-none" />
@@ -59,9 +59,28 @@ function AuthContent({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Right Panel: Independent scrollable container for forms */}
-      <div className="flex-1 h-full min-h-screen lg:min-h-0 lg:h-full bg-slate-50/60 dark:bg-slate-950 flex flex-col justify-start items-center p-4 sm:p-6 md:p-8 relative overflow-y-auto">
-        {/* Top Left Back Button */}
-        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
+      <div className="flex-1 min-h-screen lg:min-h-0 lg:h-full bg-slate-50/60 dark:bg-slate-950 flex flex-col justify-start items-center p-4 sm:p-6 md:p-8 relative overflow-y-auto">
+        {/* Top Header for Mobile */}
+        <div className="w-full max-w-md flex items-center justify-between pt-2 pb-4 lg:hidden">
+          <button
+            type="button"
+            onClick={handleBackClick}
+            className="w-9 h-9 rounded-xl bg-[#14355D] hover:bg-[#0F2A4A] text-white flex items-center justify-center transition-all shadow-md group"
+            title="Kembali"
+          >
+            <ArrowLeft className="w-4.5 h-4.5 group-hover:-translate-x-0.5 transition-transform" />
+          </button>
+          <div className="flex items-center gap-2.5">
+            <img src="/logo-pln2.png" alt="Logo PLN" className="h-8 w-auto object-contain shrink-0" />
+            <div>
+              <span className="text-base font-black text-[#103956] leading-none block">PIJAR</span>
+              <span className="text-[10px] font-bold text-sky-600 leading-none block">PLN UP3 Padang</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Back Button */}
+        <div className="hidden lg:block absolute top-6 left-6 z-20">
           <button
             type="button"
             onClick={handleBackClick}
@@ -73,7 +92,7 @@ function AuthContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Main Content Area (Consistently compact max-w-md matching Gambar 2) */}
-        <div className="w-full max-w-md my-auto py-6 flex flex-col justify-center">
+        <div className="w-full max-w-md my-auto py-2 sm:py-6 flex flex-col justify-center">
           {children}
         </div>
       </div>

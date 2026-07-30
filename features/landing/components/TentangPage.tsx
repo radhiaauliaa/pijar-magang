@@ -224,38 +224,34 @@ function TentangHeroSection() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-12">
           <div className="lg:col-span-6 flex items-center justify-center">
-            <div className="flex items-center gap-4 md:gap-5">
-              <div className="flex flex-col gap-4 items-end">
-                <div className="w-[170px] sm:w-[190px] md:w-[210px] rounded-[22px] overflow-hidden shadow-lg border-2 border-white hover:scale-105 transition-transform duration-300">
-                  <img
-                    src="/ilustrasi_5.png"
-                    alt="Dua Pekerja Wanita PLN Lapangan"
-                    className="w-full h-[115px] sm:h-[130px] md:h-[145px] object-cover"
-                  />
-                </div>
-                <div className="w-[190px] sm:w-[215px] md:w-[235px] rounded-[22px] overflow-hidden shadow-lg border-2 border-white hover:scale-105 transition-transform duration-300">
-                  <img
-                    src="/ilustrasi_4.png"
-                    alt="Barisan Pekerja PLN di Depan Gedung"
-                    className="w-full h-[130px] sm:h-[145px] md:h-[160px] object-cover"
-                  />
-                </div>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4.5 w-full max-w-md sm:max-w-lg mx-auto">
+              <div className="rounded-[20px] sm:rounded-[24px] overflow-hidden shadow-md border-2 border-white hover:scale-105 transition-transform duration-300 aspect-[4/3]">
+                <img
+                  src="/ilustrasi_5.png"
+                  alt="Dua Pekerja Wanita PLN Lapangan"
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <div className="flex flex-col gap-4 items-start">
-                <div className="w-[210px] sm:w-[240px] md:w-[270px] rounded-[22px] overflow-hidden shadow-xl border-2 border-white hover:scale-105 transition-transform duration-300">
-                  <img
-                    src="/ilustrasi_2.png"
-                    alt="Pekerja PLN di Gardu Listrik"
-                    className="w-full h-[140px] sm:h-[160px] md:h-[180px] object-cover"
-                  />
-                </div>
-                <div className="w-[200px] sm:w-[225px] md:w-[250px] rounded-[22px] overflow-hidden shadow-lg border-2 border-white hover:scale-105 transition-transform duration-300">
-                  <img
-                    src="/ilustrasi_3.png"
-                    alt="Tim Teknisi Rompi Biru PLN"
-                    className="w-full h-[135px] sm:h-[150px] md:h-[170px] object-cover"
-                  />
-                </div>
+              <div className="rounded-[20px] sm:rounded-[24px] overflow-hidden shadow-md border-2 border-white hover:scale-105 transition-transform duration-300 aspect-[4/3]">
+                <img
+                  src="/ilustrasi_4.png"
+                  alt="Barisan Pekerja PLN di Depan Gedung"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="rounded-[20px] sm:rounded-[24px] overflow-hidden shadow-md border-2 border-white hover:scale-105 transition-transform duration-300 aspect-[4/3]">
+                <img
+                  src="/ilustrasi_2.png"
+                  alt="Pekerja PLN di Gardu Listrik"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="rounded-[20px] sm:rounded-[24px] overflow-hidden shadow-md border-2 border-white hover:scale-105 transition-transform duration-300 aspect-[4/3]">
+                <img
+                  src="/ilustrasi_3.png"
+                  alt="Tim Teknisi Rompi Biru PLN"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>
