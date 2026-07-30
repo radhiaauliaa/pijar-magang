@@ -131,7 +131,7 @@ function TentangNavbar() {
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo PLN & PIJAR */}
         <Link href="/" className="flex items-center gap-2.5">
-          <img src="/logo-pln2.png" alt="Logo PLN" className="h-8.5 sm:h-9 w-auto object-contain shrink-0" />
+          <img src="/logo-pln2.png" alt="Logo PLN" className="h-8 sm:h-9 w-auto object-contain shrink-0" style={{ height: "34px", width: "auto" }} />
           <div className="flex flex-col justify-center">
             <span className="text-[#103956] font-black text-xl tracking-tight leading-none">
               PIJAR

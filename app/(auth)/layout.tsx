@@ -71,7 +71,7 @@ function AuthContent({ children }: { children: React.ReactNode }) {
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
           <div className="flex items-center gap-2.5">
-            <img src="/logo-pln2.png" alt="Logo PLN" className="h-8.5 w-auto object-contain shrink-0" />
+            <img src="/logo-pln2.png" alt="Logo PLN" className="h-8 w-auto object-contain shrink-0" style={{ height: "32px", width: "auto" }} />
             <div>
               <span className="text-base font-black text-[#103956] dark:text-white leading-none block">PIJAR</span>
               <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400 leading-none block">PLN UP3 Padang</span>
