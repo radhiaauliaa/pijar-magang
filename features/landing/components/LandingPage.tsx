@@ -42,13 +42,13 @@ function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo PLN & PIJAR */}
-        <Link href="/" className="flex items-center gap-3">
-          <img src="/logo-pln2.png" alt="Logo PLN" className="h-9 w-auto object-contain shrink-0" />
+        <Link href="/" className="flex items-center gap-2.5">
+          <img src="/logo-pln2.png" alt="Logo PLN" className="h-8.5 sm:h-9 w-auto object-contain shrink-0" />
           <div className="flex flex-col justify-center">
             <span className="text-[#103956] font-black text-xl tracking-tight leading-none">
               PIJAR
             </span>
-            <span className="text-[10px] text-sky-600 font-bold tracking-tight leading-tight">
+            <span className="hidden sm:block text-[10px] text-sky-600 font-bold tracking-tight leading-tight">
               PT PLN (Persero) UP3 Padang
             </span>
           </div>
@@ -68,57 +68,77 @@ function Navbar() {
           </Link>
         </div>
 
-        {/* CTA Buttons & Mobile Hamburger Button */}
+        {/* CTA Buttons (Desktop) & Hamburger Button (Mobile) */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link
-            href="/login"
-            className="px-3 sm:px-4 py-2 text-xs sm:text-sm text-[#103956] hover:text-sky-600 transition-colors font-bold"
-          >
-            Masuk
-          </Link>
-          <Link
-            href="/daftar"
-            className="px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm bg-[#103956] hover:bg-[#0c2c44] text-white rounded-xl font-bold shadow-md shadow-[#103956]/20 transition-all active:scale-95"
-          >
-            Daftar
-          </Link>
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/login"
+              className="px-4 py-2 text-sm text-[#103956] hover:text-sky-600 transition-colors font-bold"
+            >
+              Masuk
+            </Link>
+            <Link
+              href="/daftar"
+              className="px-6 py-2.5 text-sm bg-[#103956] hover:bg-[#0c2c44] text-white rounded-xl font-bold shadow-md shadow-[#103956]/20 transition-all active:scale-95"
+            >
+              Daftar
+            </Link>
+          </div>
 
           {/* Mobile Hamburger Toggle Button */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="md:hidden p-2 text-[#103956] hover:bg-slate-100 rounded-lg transition-colors ml-1"
+            className="md:hidden p-2 text-[#103956] hover:bg-slate-100 rounded-xl transition-colors border border-slate-200/80 shadow-2xs"
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Navigation Dropdown Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white/98 border-b border-slate-200 px-6 py-4 space-y-3 shadow-lg animate-in slide-in-from-top-2">
+        <div className="md:hidden bg-white/98 border-b border-slate-200 px-6 py-5 space-y-3.5 shadow-2xl animate-in slide-in-from-top-2">
           <Link
             href="/"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-bold text-[#103956] py-2 border-b border-slate-100"
+            className="block text-base font-bold text-[#103956] py-2 border-b border-slate-100"
           >
             Beranda
           </Link>
           <Link
             href="/fitur"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-semibold text-slate-600 hover:text-[#103956] py-2 border-b border-slate-100"
+            className="block text-base font-semibold text-slate-600 hover:text-[#103956] py-2 border-b border-slate-100"
           >
             Fitur
           </Link>
           <Link
             href="/tentang"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-semibold text-slate-600 hover:text-[#103956] py-2"
+            className="block text-base font-semibold text-slate-600 hover:text-[#103956] py-2 border-b border-slate-100"
           >
             Tentang
           </Link>
+
+          {/* Mobile Auth Buttons inside Drawer (Matching Gambar 2 Pertamina style) */}
+          <div className="pt-2 space-y-2.5">
+            <Link
+              href="/daftar"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full py-3 text-center bg-[#103956] text-white font-extrabold text-sm rounded-xl shadow-md active:scale-98 transition-transform"
+            >
+              Daftar
+            </Link>
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full py-3 text-center border-2 border-slate-200 text-[#103956] font-bold text-sm rounded-xl hover:bg-slate-50 transition-colors"
+            >
+              Masuk
+            </Link>
+          </div>
         </div>
       )}
     </nav>
