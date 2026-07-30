@@ -1,0 +1,410 @@
+"use client";
+import { useState, useCallback } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Plus, Search, Pencil, Trash2, AlertCircle, Loader2, Users,
+  Copy, CheckCircle2, Phone,
+} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { pembimbingService } from "@/services/pembimbing.service";
+import { dashboardService } from "@/services/dashboard.service";
+import { divisiService } from "@/services/divisi.service";
+import { cabangService } from "@/services/cabang.service";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { DataTable, type Column } from "@/components/shared/DataTable";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { usePagination } from "@/hooks/usePagination";
+import { useDebounce } from "@/hooks/useDebounce";
+import { pembimbingSchema, type PembimbingFormValues } from "@/lib/validations";
+import { getErrorMessage } from "@/services/api";
+import type { Cabang, Divisi, Pembimbing } from "@/types";
+
+import { getCurrentUser } from "@/lib/auth";
+
+// Temp Password Dialog
+function TempPasswordDialog({
+  open,
+  onClose,
+  nama,
+  password,
+}: {
+  open: boolean;
+  onClose: () => void;
+  nama: string;
+  password: string;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(password);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-emerald-400">
+            <CheckCircle2 className="w-5 h-5" />
+            Pembimbing Berhasil Ditambahkan
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Akun untuk <span className="font-semibold text-foreground">{nama}</span> telah dibuat.
+            Bagikan password sementara ini via WhatsApp:
+          </p>
+          <div className="bg-muted rounded-xl p-4 flex items-center justify-between gap-3">
+            <code className="font-mono text-lg font-bold tracking-wider text-foreground">
+              {password}
+            </code>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="shrink-0"
+              onClick={handleCopy}
+              title="Salin password"
+            >
+              {copied
+                ? <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                : <Copy className="w-4 h-4" />
+              }
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+            Salin password ini sekarang. Setelah dialog ditutup, password tidak bisa dilihat lagi.
+            Pembimbing bisa ganti password setelah login pertama.
+          </p>
+        </div>
+        <div className="flex justify-end pt-2">
+          <Button onClick={onClose} id="close-temp-password-btn">Selesai</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Main Component
+export function PembimbingPage() {
+  const queryClient = useQueryClient();
+  const { page, limit, setPage, setLimit, reset } = usePagination();
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"" | "aktif" | "nonaktif">("");
+  const [showForm, setShowForm] = useState(false);
+  const [editTarget, setEditTarget] = useState<Pembimbing | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Pembimbing | null>(null);
+  const [tempPassword, setTempPassword] = useState<{ nama: string; password: string } | null>(null);
+
+  const debouncedSearch = useDebounce(search, 400);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["pembimbing", page, limit, debouncedSearch, statusFilter],
+    queryFn: async () => {
+      const res = await pembimbingService.getAll({
+        page,
+        limit,
+        search: debouncedSearch || undefined,
+        status: statusFilter || undefined,
+        role: "pembimbing",
+      });
+      return res;
+    },
+  });
+
+  const { data: divisiList = [] } = useQuery({ queryKey: ["divisi"], queryFn: () => divisiService.getAll() });
+  const { data: cabangList = [] } = useQuery({ queryKey: ["cabang"], queryFn: cabangService.getAll });
+
+  const { register, handleSubmit, reset: resetForm, setValue, watch, formState: { errors } } = useForm<PembimbingFormValues>({
+    resolver: zodResolver(pembimbingSchema),
+    defaultValues: { nama: "", email: "", nomor_hp: "", divisi: "", cabang: "", status: "aktif", role: "pembimbing" },
+  });
+
+  const handleOpen = useCallback((item?: Pembimbing) => {
+    if (item) {
+      setEditTarget(item);
+      resetForm({ nama: item.nama, email: item.email, nomor_hp: "", divisi: item.divisi, cabang: item.cabang, status: item.status, role: "pembimbing" });
+    } else {
+      setEditTarget(null);
+      resetForm({ nama: "", email: "", nomor_hp: "", divisi: "", cabang: "", status: "aktif", role: "pembimbing" });
+    }
+    setShowForm(true);
+  }, [resetForm]);
+
+  const mutation = useMutation({
+    mutationFn: (values: PembimbingFormValues) =>
+      editTarget
+        ? pembimbingService.update(editTarget.id, { ...values, role: "pembimbing" })
+        : pembimbingService.create({ ...values, role: "pembimbing" }),
+    onSuccess: (result, values) => {
+      if (!editTarget) {
+        // Tampilkan temp password dari response GAS
+        const tempPwd = (result as { temp_password?: string }).temp_password;
+        if (tempPwd) {
+          setTempPassword({ nama: values.nama, password: tempPwd });
+        } else {
+          toast.success("Pembimbing berhasil ditambahkan");
+        }
+
+        // Send Email notification to newly created Pembimbing
+        const creatorUser = getCurrentUser();
+        const creatorName = creatorUser ? creatorUser.nama : "Admin";
+        const assignedCabang = (cabangList as Cabang[]).find((c) => c.id === values.cabang);
+        const unitName = assignedCabang ? assignedCabang.nama_cabang : "PT PLN (Persero) UP3 Padang";
+        const pwdToSend = tempPwd || (result as any)?.temp_password || "Password terlampir";
+
+        fetch("/api/email/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "account_created",
+            email: values.email,
+            nama: values.nama,
+            password: pwdToSend,
+            roleLabel: "Pembimbing Magang",
+            creatorName,
+            unitName,
+          }),
+        }).catch((e) => console.error("Failed to send pembimbing account email", e));
+        dashboardService.pushNotification({
+          title: "Sukses Pembuatan Akun Pembimbing",
+          message: `Akun Pembimbing Magang untuk ${values.nama} berhasil dibuat.`,
+          type: "success",
+          role: "admin",
+        });
+      } else {
+        toast.success("Pembimbing berhasil diperbarui");
+      }
+      queryClient.invalidateQueries({ queryKey: ["pembimbing"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      setShowForm(false);
+      setEditTarget(null);
+      resetForm();
+    },
+    onError: (err) => toast.error(getErrorMessage(err)),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => pembimbingService.delete(id),
+    onSuccess: () => {
+      toast.success("Pembimbing berhasil dihapus");
+      queryClient.invalidateQueries({ queryKey: ["pembimbing"] });
+      setDeleteTarget(null);
+    },
+    onError: (err) => toast.error(getErrorMessage(err)),
+  });
+
+  const divisiMap = new Map((divisiList as Divisi[]).map((d) => [d.id, d.nama_divisi]));
+  const cabangMap = new Map((cabangList as Cabang[]).map((c) => [c.id, c.nama_cabang]));
+
+  const columns: Column<Pembimbing>[] = [
+    { key: "nama", title: "Nama" },
+    { key: "email", title: "Email" },
+    { key: "divisi", title: "Divisi", render: (row) => divisiMap.get(row.divisi) ?? row.divisi ?? "-" },
+    { key: "cabang", title: "Unit", render: (row) => cabangMap.get(row.cabang) ?? row.cabang ?? "-" },
+    { key: "jumlah_mahasiswa", title: "Mahasiswa", render: (row) => String(row.jumlah_mahasiswa ?? 0) },
+    { key: "status", title: "Status", render: (row) => <StatusBadge status={row.status} /> },
+    {
+      key: "actions" as keyof Pembimbing,
+      title: "Aksi",
+      className: "w-24",
+      render: (row) => (
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleOpen(row)} title="Edit">
+            <Pencil className="w-3.5 h-3.5" />
+          </Button>
+          <Button
+            variant="ghost" size="icon"
+            className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+            onClick={() => setDeleteTarget(row)} title="Hapus"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Kelola Pembimbing" description="Atur akun pembimbing dan penempatan divisi/unit">
+        <Button size="sm" onClick={() => handleOpen()} id="add-pembimbing-btn">
+          <Plus className="w-4 h-4 mr-2" />
+          Tambah Pembimbing
+        </Button>
+      </PageHeader>
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Cari nama atau email..."
+            className="pl-9"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); reset(); }}
+            id="pembimbing-search"
+          />
+        </div>
+        <Select value={statusFilter || "all"} onValueChange={(v) => { setStatusFilter(v === "all" ? "" : v as "aktif" | "nonaktif"); reset(); }}>
+          <SelectTrigger className="w-40" id="status-filter">
+            <SelectValue placeholder="Semua Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="aktif">Aktif</SelectItem>
+            <SelectItem value="nonaktif">Nonaktif</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <DataTable
+        data={data?.items ?? []}
+        columns={columns}
+        loading={isLoading}
+        page={page}
+        limit={limit}
+        total={data?.total ?? 0}
+        onPageChange={setPage}
+        onLimitChange={setLimit}
+        rowKey="id"
+        emptyState={<EmptyState icon={Users} title="Belum ada pembimbing" description="Tambahkan pembimbing pertama dengan klik tombol Tambah" />}
+      />
+
+      {/* Form Dialog */}
+      <Dialog open={showForm} onOpenChange={(v) => { setShowForm(v); if (!v) setEditTarget(null); }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editTarget ? "Edit Pembimbing" : "Tambah Pembimbing"}</DialogTitle>
+          </DialogHeader>
+
+          {!editTarget && (
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg px-4 py-3 text-sm text-blue-300 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+              <span>
+                Password akan <strong>di-generate otomatis</strong> oleh sistem. Setelah disimpan,
+                kamu bisa menyalinnya dan kirim ke pembimbing via WhatsApp.
+              </span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit((values) => mutation.mutate(values))} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="pb-nama">Nama</Label>
+                <Input id="pb-nama" placeholder="Nama pembimbing" {...register("nama")} />
+                {errors.nama && <p className="text-red-500 text-xs">{errors.nama.message}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="pb-email">Email</Label>
+                <Input id="pb-email" type="email" placeholder="email@contoh.com" {...register("email")} />
+                {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="pb-hp" className="flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5" /> No. HP / WhatsApp <span className="text-muted-foreground">(opsional)</span>
+                </Label>
+                <Input id="pb-hp" type="tel" placeholder="08xxxxxxxxxx" {...register("nomor_hp")} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Status</Label>
+                <Select
+                  value={watch("status") || "aktif"}
+                  onValueChange={(v) => setValue("status", v as "aktif" | "nonaktif", { shouldValidate: true })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="aktif">Aktif</SelectItem>
+                    <SelectItem value="nonaktif">Nonaktif</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.status && <p className="text-red-500 text-xs">{errors.status.message}</p>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Divisi</Label>
+                <Select value={watch("divisi") || ""} onValueChange={(v) => setValue("divisi", v, { shouldValidate: true })}>
+                  <SelectTrigger><SelectValue placeholder="Pilih divisi" /></SelectTrigger>
+                  <SelectContent>
+                    {(divisiList as Divisi[]).map((d) => (
+                      <SelectItem key={d.id} value={d.id}>{d.nama_divisi}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.divisi && <p className="text-red-500 text-xs">{errors.divisi.message}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label>Unit</Label>
+                <Select value={watch("cabang") || ""} onValueChange={(v) => setValue("cabang", v, { shouldValidate: true })}>
+                  <SelectTrigger><SelectValue placeholder="Pilih unit" /></SelectTrigger>
+                  <SelectContent>
+                    {(cabangList as Cabang[]).map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nama_cabang}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.cabang && <p className="text-red-500 text-xs">{errors.cabang.message}</p>}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                Batal
+              </Button>
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {editTarget ? "Simpan Perubahan" : "Buat Akun Pembimbing"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={(v) => { if (!v) setDeleteTarget(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-500" />
+              Hapus Pembimbing
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Yakin ingin menghapus <strong>{deleteTarget?.nama}</strong>? Jika masih memiliki mahasiswa binaan, penghapusan akan ditolak.
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>Batal</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+              disabled={deleteMutation.isPending}
+            >
+              Hapus
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Temp Password Dialog */}
+      {tempPassword && (
+        <TempPasswordDialog
+          open={!!tempPassword}
+          onClose={() => setTempPassword(null)}
+          nama={tempPassword.nama}
+          password={tempPassword.password}
+        />
+      )}
+    </div>
+  );
+}
