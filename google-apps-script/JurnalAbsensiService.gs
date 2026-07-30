@@ -24,21 +24,29 @@ var JurnalService = (function() {
         if (!m) return false;
         return (m.pembimbing === currentUser.id) ||
                (m.pembimbing === currentUser.email) ||
+               (m.pembimbing === currentUser.nama) ||
                (m.divisi === currentUser.divisi && currentUser.divisi !== '');
       });
     }
 
-    if (search) rows = rows.filter(function(r) { return (r.judul + (r.mahasiswa_nama || '')).toLowerCase().indexOf(search) !== -1; });
-    if (status) rows = rows.filter(function(r) { return r.status === status; });
-    if (mhsId) rows = rows.filter(function(r) { return r.mahasiswa_id === mhsId; });
-
+    // Map mahasiswa details FIRST before search filtering
     rows = rows.map(function(r) {
       var m = mhsMap[r.mahasiswa_id];
       return Object.assign({}, r, {
-        mahasiswa_nama: m ? m.nama : r.mahasiswa_id,
-        mahasiswa_universitas: m ? m.universitas : '',
+        mahasiswa_nama: m ? m.nama : (r.mahasiswa_nama || r.mahasiswa_id),
+        mahasiswa_universitas: m ? m.universitas : (r.mahasiswa_universitas || ''),
       });
     });
+
+    if (search) {
+      rows = rows.filter(function(r) {
+        var combined = ((r.judul || '') + ' ' + (r.mahasiswa_nama || '') + ' ' + (r.deskripsi || '') + ' ' + (r.mahasiswa_universitas || '')).toLowerCase();
+        return combined.indexOf(search) !== -1;
+      });
+    }
+
+    if (status) rows = rows.filter(function(r) { return r.status === status; });
+    if (mhsId) rows = rows.filter(function(r) { return r.mahasiswa_id === mhsId; });
 
     rows.sort(function(a, b) { return (b.tanggal || '').localeCompare(a.tanggal || ''); });
 

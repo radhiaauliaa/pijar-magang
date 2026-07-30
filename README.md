@@ -52,6 +52,9 @@ Sistem PIJAR menerapkan **Role-Based Access Control (RBAC)** ketat yang membagi 
 
 ### 4. Admin Utama UP3 Padang (`role: admin`)
 - **Manajemen Lamaran Masuk:** Meninjau berkas pendaftaran (Surat Ajuan, CV, Proposal Magang PDF), menyetujui (Approve) atau menolak (Reject) calon mahasiswa.
+- **Upload Surat Balasan Penerimaan Magang PLN:** Mengunggah file Surat Balasan Resmi Penerimaan Magang (PDF/Gambar) yang secara otomatis tersimpan di Google Drive dan terhubung ke link pengunduhan mahasiswa.
+- **Disposisi Transfer ULP:** Menyalurkan penempatan mahasiswa ke Cabang ULP (Belanti, Tabing, Sicincin, dll.) di mana penetapan Divisi & Pembimbing dilimpahkan ke Admin ULP.
+- **Notifikasi WhatsApp Direct & Email:** Terintegrasi dengan notifikasi WhatsApp Direct (`wa.me`) dan Notifikasi Email berdesain resmi PLN dengan tombol langsung *📄 Unduh Surat Penerimaan (PDF)*.
 - **Penempatan Dinamis & Terfilter:** Saat menyetujui lamaran, dropdown pilihan Pembimbing otomatis ter-filter secara presisi berdasarkan **Divisi** dan **Cabang** yang dipilih.
 - **Manajemen User (Pembimbing & Admin ULP):** Membuat akun baru untuk Pembimbing dan Admin ULP dengan *temporary password* otomatis yang siap disalin ke WhatsApp/Email.
 - **Kelola Divisi & Cabang:** Pengaturan kapasitas maksimum mahasiswa di UP3 Padang maupun Cabang ULP.
@@ -79,11 +82,52 @@ Sistem PIJAR menerapkan **Role-Based Access Control (RBAC)** ketat yang membagi 
 ### Backend, Database & External Services
 - **[Google Apps Script (GAS)](https://developers.google.com/apps-script):** Serverless Backend Engine gratis dan andal.
 - **[Google Sheets API (Database)](https://www.google.com/sheets/about/):** NoSQL-like Relational Spreadsheet (*Users, Mahasiswa, Pembimbing, Divisi, Cabang, Lamaran, Jurnal, Absensi, Log Aktivitas*).
-- **[Google Drive API (Cloud Storage):](https://www.google.com/drive/)** Penyimpanan berkas PDF Surat Ajuan, CV, Proposal Magang, Foto Jurnal, dan Foto Profil Avatar.
+- **[Google Drive API (Cloud Storage):](https://www.google.com/drive/)** Penyimpanan berkas PDF Surat Ajuan, CV, Proposal Magang, Surat Balasan Penerimaan PLN, Foto Jurnal, dan Foto Profil Avatar.
 - **[Nodemailer / GAS MailApp:](https://nodemailer.com/)** Layanan pengiriman notifikasi email konfirmasi & OTP.
 - **[JWT (JSON Web Token):](https://jwt.io/)** Autentikasi sesi berbasis token aman.
 
 ---
+
+## Panduan Instalasi & Jalankan Lokal
+
+### 1. Prerequisites (Prasyarat)
+Pastikan perangkat komputer Anda sudah terinstal:
+- **Node.js:** v18.0.0 atau versi lebih baru.
+- **npm:** v9.0.0 atau **pnpm** / **yarn**.
+
+### 2. Clone Repository & Install Dependencies
+```bash
+# Clone repository
+git clone https://github.com/username/monitoring-magang.git
+
+# Masuk ke direktori proyek
+cd monitoring-magang
+
+# Install seluruh dependensi
+npm install
+```
+
+### 3. Konfigurasi Environment Variables (`.env.local`)
+Buat berkas `.env.local` pada root direktori proyek dan isikan variabel berikut dengan nilai rahasia Anda:
+
+```env
+# URL Google Apps Script Web App Deployment
+NEXT_PUBLIC_API_URL="your_google_apps_script_web_app_url_here"
+
+# JWT Secret Key (bebas/random string)
+JWT_SECRET="your_jwt_secret_here"
+
+# Google OAuth Client ID (opsional untuk Google Sign-In)
+NEXT_PUBLIC_GOOGLE_CLIENT_ID="your_google_client_id_here"
+
+# Email Gateway Credentials (Gmail App Password)
+EMAIL_USER="your_email@gmail.com"
+EMAIL_FROM="PIJAR Internship <your_email@gmail.com>"
+EMAIL_PASS="your_gmail_app_password_here"
+
+# WhatsApp Direct Notification Default Fallback Phone Number
+NEXT_PUBLIC_DEFAULT_WA_NUMBER="628xxxxxxxxxx"
+```
 
 ## Struktur Arsitektur & Direktori Proyek
 
@@ -330,14 +374,25 @@ npm install
 ```
 
 ### 3. Konfigurasi Environment Variables (`.env.local`)
-Buat berkas `.env.local` pada root direktori proyek dan isikan variabel berikut:
+Buat berkas `.env.local` pada root direktori proyek dan isikan variabel berikut dengan nilai rahasia Anda:
 
 ```env
 # URL Google Apps Script Web App Deployment
-NEXT_PUBLIC_API_URL="https://script.google.com/macros/s/AKfycbx.../exec"
+NEXT_PUBLIC_API_URL="your_google_apps_script_web_app_url_here"
 
-# URL Aplikasi Lokal
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+# JWT Secret Key (bebas/random string)
+JWT_SECRET="your_jwt_secret_here"
+
+# Google OAuth Client ID (opsional untuk Google Sign-In)
+NEXT_PUBLIC_GOOGLE_CLIENT_ID="your_google_client_id_here"
+
+# Email Gateway Credentials (Gmail App Password)
+EMAIL_USER="your_email@gmail.com"
+EMAIL_FROM="PIJAR Internship <your_email@gmail.com>"
+EMAIL_PASS="your_gmail_app_password_here"
+
+# WhatsApp Direct Notification Default Fallback Phone Number
+NEXT_PUBLIC_DEFAULT_WA_NUMBER="628xxxxxxxxxx"
 ```
 
 ### 4. Jalankan Development Server

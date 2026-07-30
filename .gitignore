@@ -9,7 +9,7 @@
 /build/
 /dist/
 
-# Environment Variables (SENSITIVE - NEVER COMMIT TO GIT)
+# Environment Variables
 .env
 .env.local
 .env.development.local

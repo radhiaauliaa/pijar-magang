@@ -140,7 +140,7 @@ export function JurnalMahasiswaPage() {
       </PageHeader>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-start gap-2">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-36 h-9 text-xs bg-background" id="filter-jurnal-status-select">
             <SelectValue placeholder="Status" />
@@ -149,7 +149,6 @@ export function JurnalMahasiswaPage() {
             <SelectItem value="all">Semua Status</SelectItem>
             <SelectItem value="submitted">Menunggu</SelectItem>
             <SelectItem value="verified">Disetujui</SelectItem>
-            <SelectItem value="revisi">Revisi</SelectItem>
           </SelectContent>
         </Select>
 

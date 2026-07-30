@@ -81,9 +81,15 @@ export function JurnalAdminPage() {
 
   const rawItems = data?.items ?? [];
 
-  // Filter local items by selected date if set
+  // Filter local items by selected date and search text
   let filteredItems = rawItems.filter((item) => {
-    return isSameDateStr(item.tanggal, selectedDate);
+    const matchDate = isSameDateStr(item.tanggal, selectedDate);
+    const mName = String((item as any).mahasiswa_nama || item.mahasiswa_id || "").toLowerCase();
+    const jTitle = String(item.judul || "").toLowerCase();
+    const jDesc = String(item.deskripsi || "").toLowerCase();
+    const q = debouncedSearch.toLowerCase().trim();
+    const matchQuery = !q || mName.includes(q) || jTitle.includes(q) || jDesc.includes(q);
+    return matchDate && matchQuery;
   });
 
   filteredItems.sort((a, b) => {
@@ -147,7 +153,6 @@ export function JurnalAdminPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Status</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
             <SelectItem value="submitted">Menunggu</SelectItem>
             <SelectItem value="verified">Terverifikasi</SelectItem>
           </SelectContent>

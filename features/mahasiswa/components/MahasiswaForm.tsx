@@ -30,6 +30,7 @@ export function MahasiswaForm({ defaultValues, onSuccess }: MahasiswaFormProps) 
   const isEdit = !!defaultValues;
   const currentUser = getCurrentUser();
   const isAdminUlp = currentUser?.role === "admin_ulp";
+  const isPembimbing = currentUser?.role === "pembimbing";
 
   const [capacityAlert, setCapacityAlert] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<Divisi[]>([]);
@@ -182,12 +183,13 @@ export function MahasiswaForm({ defaultValues, onSuccess }: MahasiswaFormProps) 
 
       {/* Divisi */}
       <div className="space-y-1.5">
-        <Label>Divisi</Label>
+        <Label>Divisi {isPembimbing && <span className="text-xs text-muted-foreground font-normal">(Terkunci)</span>}</Label>
         <Select
           value={watch("divisi")}
+          disabled={isPembimbing}
           onValueChange={(v) => setValue("divisi", v, { shouldValidate: true })}
         >
-          <SelectTrigger id="divisi-select">
+          <SelectTrigger id="divisi-select" className={isPembimbing ? "bg-muted cursor-not-allowed opacity-80" : ""}>
             <SelectValue placeholder="Pilih divisi" />
           </SelectTrigger>
           <SelectContent>
@@ -218,13 +220,13 @@ export function MahasiswaForm({ defaultValues, onSuccess }: MahasiswaFormProps) 
 
       {/* Unit */}
       <div className="space-y-1.5">
-        <Label>Unit {isAdminUlp && <span className="text-xs text-muted-foreground font-normal">(Terkunci di ULP Anda)</span>}</Label>
+        <Label>Unit {(isAdminUlp || isPembimbing) && <span className="text-xs text-muted-foreground font-normal">(Terkunci)</span>}</Label>
         <Select
           value={watch("cabang")}
-          disabled={isAdminUlp}
+          disabled={isAdminUlp || isPembimbing}
           onValueChange={(v) => setValue("cabang", v, { shouldValidate: true })}
         >
-          <SelectTrigger id="cabang-select" className={isAdminUlp ? "bg-muted cursor-not-allowed opacity-80" : ""}>
+          <SelectTrigger id="cabang-select" className={isAdminUlp || isPembimbing ? "bg-muted cursor-not-allowed opacity-80" : ""}>
             <SelectValue placeholder="Pilih unit" />
           </SelectTrigger>
           <SelectContent>
@@ -240,12 +242,13 @@ export function MahasiswaForm({ defaultValues, onSuccess }: MahasiswaFormProps) 
 
       {/* Pembimbing */}
       <div className="space-y-1.5">
-        <Label>Pembimbing</Label>
+        <Label>Pembimbing {isPembimbing && <span className="text-xs text-muted-foreground font-normal">(Terkunci)</span>}</Label>
         <Select
           value={watch("pembimbing")}
+          disabled={isPembimbing}
           onValueChange={(v) => setValue("pembimbing", v, { shouldValidate: true })}
         >
-          <SelectTrigger id="pembimbing-select">
+          <SelectTrigger id="pembimbing-select" className={isPembimbing ? "bg-muted cursor-not-allowed opacity-80" : ""}>
             <SelectValue placeholder="Pilih pembimbing" />
           </SelectTrigger>
           <SelectContent>
