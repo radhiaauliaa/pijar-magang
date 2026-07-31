@@ -183,6 +183,41 @@ function ApproveModal({ lamaran, onClose, onSuccessOpenWA }: ApproveModalProps) 
         }).catch((e) => console.error("Failed to send acceptance email", e));
       }
 
+      // Email Notifikasi Khusus ke Admin ULP Unit yang ditunjuk
+      if (isUlpTransfer && selectedCabangObj && lamaran) {
+        const targetUlpAdmins = pembimbingList.filter((p) => {
+          const isRoleMatch = (p as any).role === "admin_ulp";
+          const isCabangMatch =
+            p.cabang === selectedCabangObj.id ||
+            (p as any).cabang_id === selectedCabangObj.id ||
+            (p as any).ulp_id === selectedCabangObj.id ||
+            p.cabang === selectedCabangObj.nama_cabang ||
+            String(p.cabang).toLowerCase().includes(selectedCabangObj.nama_cabang.toLowerCase()) ||
+            String(selectedCabangObj.nama_cabang).toLowerCase().includes(String(p.cabang).toLowerCase());
+          return isRoleMatch && isCabangMatch;
+        });
+
+        targetUlpAdmins.forEach((adminUlp) => {
+          if (adminUlp.email) {
+            fetch("/api/email/send", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                type: "ulp_transfer_notice",
+                email: adminUlp.email,
+                adminName: adminUlp.nama,
+                ulpName: selectedCabangObj.nama_cabang,
+                mhsNama: lamaran.nama,
+                mhsUniversitas: lamaran.universitas,
+                mhsProdi: lamaran.program_studi,
+                tanggalMulai: lamaran.tanggal_mulai,
+                tanggalSelesai: lamaran.tanggal_selesai,
+              }),
+            }).catch((e) => console.error("Failed to send ULP transfer notice email to Admin ULP", e));
+          }
+        });
+      }
+
       // Generate WhatsApp Link & Trigger Modal
       if (lamaran && onSuccessOpenWA) {
         const waUrl = getWhatsAppNotificationLink({

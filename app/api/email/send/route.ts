@@ -9,6 +9,7 @@ import {
   getAccountDeactivatedTemplate,
   getAccountCreatedTemplate,
   getUpdatePenempatanTemplate,
+  getUlpTransferNoticeTemplate,
 } from "@/lib/email-templates";
 import { addNotification } from "@/lib/notifications-store";
 
@@ -45,6 +46,21 @@ export async function POST(request: NextRequest) {
     let notifType: "lamaran" | "reminder" | "status" | "info" = "info";
 
     switch (type) {
+      case "ulp_transfer_notice":
+        emailData = getUlpTransferNoticeTemplate({
+          adminName: body.adminName || recipientName,
+          ulpName: body.ulpName || "ULP",
+          mhsNama: body.mhsNama || "-",
+          mhsUniversitas: body.mhsUniversitas || "-",
+          mhsProdi: body.mhsProdi || "-",
+          tanggalMulai,
+          tanggalSelesai,
+        });
+        notifTitle = "Disposisi Mahasiswa Magang Baru";
+        notifMessage = `Mahasiswa ${body.mhsNama || ""} (${body.mhsUniversitas || ""}) telah didisposisikan ke ${body.ulpName || "ULP"}.`;
+        notifType = "info";
+        break;
+
       case "update_penempatan":
         emailData = getUpdatePenempatanTemplate({
           nama: recipientName,

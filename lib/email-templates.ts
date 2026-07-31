@@ -408,3 +408,57 @@ export function getAccountDeactivatedTemplate(nama: string): { subject: string; 
 
   return { subject, html: getBaseWrapper({ title: subject, bodyContent }) };
 }
+
+// Template Disposisi Mahasiswa Baru ke Admin ULP
+export function getUlpTransferNoticeTemplate({
+  adminName,
+  ulpName,
+  mhsNama,
+  mhsUniversitas,
+  mhsProdi,
+  tanggalMulai,
+  tanggalSelesai,
+}: {
+  adminName: string;
+  ulpName: string;
+  mhsNama: string;
+  mhsUniversitas: string;
+  mhsProdi: string;
+  tanggalMulai?: string;
+  tanggalSelesai?: string;
+}): { subject: string; html: string } {
+  const subject = `[PIJAR] Disposisi Mahasiswa Magang Baru di ${ulpName}`;
+  const bodyContent = `
+    <p style="font-size: 16px; font-weight: 600; color: #2d3748;">Halo ${adminName},</p>
+    <p>Admin UP3 Padang telah mendisposisikan 1 mahasiswa magang baru ke unit Anda (<strong>${ulpName}</strong>).</p>
+    
+    <div class="info-card">
+      <p style="margin: 0 0 10px 0; font-weight: bold; color: #2d3748;">Detail Mahasiswa Magang:</p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr>
+          <td style="padding: 6px 0; color: #718096; width: 140px;">Nama Mahasiswa:</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${mhsNama}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #718096;">Kampus / Prodi:</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${mhsUniversitas} (${mhsProdi})</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #718096;">Periode Magang:</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #005BAC;">${tanggalMulai || "-"} s/d ${tanggalSelesai || "-"}</td>
+        </tr>
+      </table>
+    </div>
+
+    <p>Silakan login ke aplikasi <strong>PIJAR</strong> untuk menentukan Divisi Penempatan & Pembimbing Lapangan bagi mahasiswa tersebut.</p>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://pijar-magang.vercel.app"}/login" class="btn-action" target="_blank">Login ke Dashboard PIJAR</a>
+    </div>
+
+    <br>
+    <p style="margin-bottom: 0;">Salam,<br><strong>Tim PIJAR</strong><br>PT PLN (Persero) UP3 Padang</p>
+  `;
+
+  return { subject, html: getBaseWrapper({ title: subject, bodyContent }) };
+}
