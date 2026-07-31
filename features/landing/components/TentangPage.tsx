@@ -124,8 +124,8 @@ function TentangNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-xs border-b border-slate-200/80"
-          : "bg-white/80 backdrop-blur-sm border-b border-slate-100"
+          ? "bg-white md:bg-white/95 md:backdrop-blur-md shadow-xs border-b border-slate-200/80"
+          : "bg-white md:bg-white/80 md:backdrop-blur-sm border-b border-slate-100"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
@@ -187,7 +187,7 @@ function TentangNavbar() {
 
       {/* Mobile Navigation Dropdown Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white/98 border-b border-slate-200 px-6 py-5 space-y-3.5 shadow-2xl animate-in slide-in-from-top-2">
+        <div className="md:hidden bg-white opacity-100 border-b border-slate-200 px-6 py-5 space-y-3.5 shadow-2xl relative z-50 animate-in slide-in-from-top-2">
           <Link
             href="/"
             onClick={() => setMobileMenuOpen(false)}

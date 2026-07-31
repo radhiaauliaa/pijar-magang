@@ -539,9 +539,9 @@ export function RegisterForm() {
     <div className="w-full space-y-6">
       {/* Top Header & Steps (hidden when role is pembimbing) */}
       {showHeaderAndSteps && (
-        <div className="text-center space-y-3 mb-2">
-          <div className="h-10 flex items-center justify-center">
-            <h1 className="text-2xl font-black text-foreground tracking-tight leading-none">
+        <div className="text-center space-y-1.5 mb-1 sm:mb-2">
+          <div className="h-8 sm:h-10 flex items-center justify-center">
+            <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-none">
               Pendaftaran Akun Magang
             </h1>
           </div>

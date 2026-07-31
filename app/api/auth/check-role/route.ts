@@ -27,23 +27,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, role: KNOWN_ROLES[cleanEmail] });
   }
 
-  // 2. Try fetching live role from Google Apps Script database
-  if (GAS_URL) {
-    try {
-      const url = `${GAS_URL}?action=checkRole&email=${encodeURIComponent(cleanEmail)}`;
-      const res = await fetch(url, { method: "GET", next: { revalidate: 10 } });
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data?.role) {
-          return NextResponse.json({ success: true, role: json.data.role });
-        }
-      }
-    } catch (err) {
-      console.warn("[CheckRole Proxy Error]", err);
-    }
-  }
-
-  // 3. Fallback heuristics for unlisted emails
+  // 2. Fallback heuristics for unlisted emails (0ms latency)
   if (
     cleanEmail.includes("admin") ||
     cleanEmail.includes("up3") ||
@@ -60,6 +44,25 @@ export async function GET(request: NextRequest) {
     cleanEmail.endsWith("@pln.co.id")
   ) {
     return NextResponse.json({ success: true, role: "pembimbing" });
+  }
+
+  // 3. Try fetching live role from Google Apps Script database with 600ms timeout
+  if (GAS_URL) {
+    try {
+      const url = `${GAS_URL}?action=checkRole&email=${encodeURIComponent(cleanEmail)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 600);
+      const res = await fetch(url, { method: "GET", signal: controller.signal, next: { revalidate: 60 } });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data?.role) {
+          return NextResponse.json({ success: true, role: json.data.role });
+        }
+      }
+    } catch {
+      // Timeout or error fallback
+    }
   }
 
   return NextResponse.json({ success: true, role: "mahasiswa" });

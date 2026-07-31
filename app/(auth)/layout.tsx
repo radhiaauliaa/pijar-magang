@@ -59,9 +59,9 @@ function AuthContent({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Right Panel: Independent scrollable container for forms */}
-      <div className="flex-1 min-h-screen lg:min-h-0 lg:h-full bg-slate-50/60 dark:bg-slate-950 flex flex-col justify-start items-center p-4 sm:p-6 md:p-8 relative overflow-y-auto">
+      <div className="flex-1 min-h-screen lg:min-h-0 lg:h-full bg-slate-50/60 dark:bg-slate-950 flex flex-col justify-start items-center p-3 sm:p-6 md:p-8 relative overflow-y-auto">
         {/* Top Header for Mobile */}
-        <div className="w-full max-w-md flex items-center justify-between pt-3 pb-6 mb-2 lg:hidden border-b border-slate-200/60 dark:border-slate-800/60">
+        <div className="w-full max-w-md flex items-center justify-between pt-1 pb-3 mb-1 lg:hidden border-b border-slate-200/60 dark:border-slate-800/60">
           <button
             type="button"
             onClick={handleBackClick}
@@ -92,7 +92,7 @@ function AuthContent({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Main Content Area (Consistently compact max-w-md matching Gambar 2) */}
-        <div className="w-full max-w-md my-auto py-2 sm:py-6 flex flex-col justify-center">
+        <div className="w-full max-w-md my-0 lg:my-auto py-1 sm:py-6 flex flex-col justify-start lg:justify-center">
           {children}
         </div>
       </div>
