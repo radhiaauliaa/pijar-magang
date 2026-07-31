@@ -543,7 +543,12 @@ function FAQSection() {
   ];
 
   return (
-    <section className="py-20 bg-slate-50/70 relative overflow-hidden border-t border-slate-100">
+    <section className="py-20 bg-slate-50/70 relative overflow-hidden border-t border-slate-100 select-none">
+      {/* Decorative Glowing Blue Circles Background Ornaments */}
+      <div className="absolute -top-16 -left-16 w-80 h-80 rounded-full bg-sky-400/20 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 -right-20 -translate-y-1/2 w-96 h-96 rounded-full bg-blue-600/15 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 left-1/3 w-72 h-72 rounded-full bg-indigo-500/15 blur-3xl pointer-events-none" />
+
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-12">
