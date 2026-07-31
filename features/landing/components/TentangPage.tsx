@@ -244,17 +244,18 @@ function TentangHeroSection() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-12">
           <div className="lg:col-span-6 flex items-center justify-center">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4.5 w-full max-w-md sm:max-w-lg mx-auto items-center">
-              {/* Left Column: Top small horizontal, Bottom tall vertical */}
-              <div className="space-y-3 sm:space-y-4.5">
-                <div className="rounded-[10px] overflow-hidden shadow-md hover:scale-[1.02] transition-transform duration-300 aspect-[4/3]">
+            {/* 4 Asymmetric Landscape Images Grid Matching Gambar 2 */}
+            <div className="flex flex-col gap-3 sm:gap-4 w-full max-w-md sm:max-w-lg mx-auto">
+              {/* Top Row: Small Landscape (Left) + Large Landscape (Right) */}
+              <div className="flex items-end justify-center gap-3 sm:gap-4">
+                <div className="w-[38%] aspect-[4/3] rounded-[10px] overflow-hidden shadow-md shrink-0 hover:scale-[1.02] transition-transform duration-300">
                   <img
                     src="/ilustrasi_5.png"
                     alt="Dua Pekerja Wanita PLN Lapangan"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="rounded-[10px] overflow-hidden shadow-md hover:scale-[1.02] transition-transform duration-300 aspect-[3/4]">
+                <div className="w-[58%] aspect-[16/10] rounded-[10px] overflow-hidden shadow-md shrink-0 hover:scale-[1.02] transition-transform duration-300">
                   <img
                     src="/ilustrasi_2.png"
                     alt="Pekerja PLN di Gardu Listrik"
@@ -263,16 +264,16 @@ function TentangHeroSection() {
                 </div>
               </div>
 
-              {/* Right Column: Top wide, Bottom medium horizontal */}
-              <div className="space-y-3 sm:space-y-4.5">
-                <div className="rounded-[10px] overflow-hidden shadow-md hover:scale-[1.02] transition-transform duration-300 aspect-[16/10]">
+              {/* Bottom Row: Medium Landscape (Left) + Medium Landscape (Right) */}
+              <div className="flex items-start justify-center gap-3 sm:gap-4">
+                <div className="w-[50%] aspect-[14/10] rounded-[10px] overflow-hidden shadow-md shrink-0 hover:scale-[1.02] transition-transform duration-300">
                   <img
                     src="/ilustrasi_4.png"
                     alt="Barisan Pekerja PLN di Depan Gedung"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="rounded-[10px] overflow-hidden shadow-md hover:scale-[1.02] transition-transform duration-300 aspect-[4/3]">
+                <div className="w-[44%] aspect-[4/3] rounded-[10px] overflow-hidden shadow-md shrink-0 hover:scale-[1.02] transition-transform duration-300">
                   <img
                     src="/ilustrasi_3.png"
                     alt="Tim Teknisi Rompi Biru PLN"
@@ -282,10 +283,10 @@ function TentangHeroSection() {
               </div>
             </div>
           </div>
-          <div className="lg:col-span-6 space-y-6 text-left">
-            {/* <span className="text-sky-600 font-extrabold text-sm uppercase tracking-wider bg-sky-50 px-3.5 py-1.5 rounded-full border border-sky-100">
+          <div className="lg:col-span-6 space-y-4 text-left">
+            <span className="text-[#103956] font-bold text-sm sm:text-base tracking-tight block">
               Siapa kami?
-            </span> */}
+            </span>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#103956] tracking-tight leading-tight">
               PT PLN (Persero) UP3 Padang
