@@ -21,7 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { getErrorMessage } from "@/services/api";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getWhatsAppNotificationLink } from "@/lib/utils";
 import { CONFIG } from "@/constants/config";
 import type { Lamaran, Divisi, Cabang, Pembimbing, LamaranStatus } from "@/types";
 
@@ -41,45 +41,7 @@ function StatusBadge({ status }: { status: LamaranStatus }) {
   );
 }
 
-// Helper generator for WhatsApp direct notification link
-function getWhatsAppNotificationLink(options: {
-  nomorHp?: string;
-  nama: string;
-  type: "diterima" | "ditolak";
-  unitName: string;
-  divisiName?: string;
-  pembimbingName?: string;
-  tanggalMulai?: string;
-  tanggalSelesai?: string;
-  alasanTolak?: string;
-}): string {
-  let rawHp = String(options.nomorHp || "").replace(/[^0-9]/g, "");
-  if (!rawHp) rawHp = CONFIG.DEFAULT_WA_NUMBER;
-  if (rawHp.startsWith("0")) rawHp = "62" + rawHp.substring(1);
-  if (!rawHp.startsWith("62")) rawHp = "62" + rawHp;
 
-  let text = "";
-  if (options.type === "diterima") {
-    text = `*PEMBERITAHUAN PENERIMAAN MAGANG PLN UP3 PADANG*\n\n` +
-      `Selamat! Lamaran Magang atas nama *${options.nama}* di PT PLN (Persero) telah *DITERIMA*.\n\n` +
-      `📌 *Detail Penempatan*:\n` +
-      `• Unit: *${options.unitName}*\n` +
-      `• Divisi: *${options.divisiName || "Akan Ditentukan"}*\n` +
-      `• Pembimbing: *${options.pembimbingName || "Akan Ditentukan"}*\n` +
-      `• Periode: ${formatDate(options.tanggalMulai)} s/d ${formatDate(options.tanggalSelesai)}\n\n` +
-      `📩 *Silakan cek Email Anda atau login ke platform PIJAR untuk mengunduh Surat Balasan Resmi Penerimaan Magang Anda.* 📄\n\n` +
-      `Terima kasih!`;
-  } else {
-    text = `*PEMBERITAHUAN LAMARAN MAGANG PLN UP3 PADANG*\n\n` +
-      `Halo Kak *${options.nama}*,\n` +
-      `Terima kasih telah mengajukan lamaran magang di PT PLN (Persero) UP3 Padang.\n\n` +
-      `Mohon maaf, lamaran magang Anda saat ini *BELUM DAPAT DITERIMA*.\n` +
-      `📝 *Alasan*: ${options.alasanTolak || "Kapasitas kuota penempatan penuh"}\n\n` +
-      `Tetap semangat dan sukses selalu!`;
-  }
-
-  return `https://wa.me/${rawHp}?text=${encodeURIComponent(text)}`;
-}
 
 // Approve Modal 
 interface ApproveModalProps {

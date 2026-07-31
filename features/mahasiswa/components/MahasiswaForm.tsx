@@ -20,6 +20,7 @@ import {
 import { getErrorMessage } from "@/services/api";
 import type { Mahasiswa, Divisi, Cabang } from "@/types";
 import { getCurrentUser } from "@/lib/auth";
+import { getWhatsAppNotificationLink } from "@/lib/utils";
 
 interface MahasiswaFormProps {
   defaultValues?: Mahasiswa;
@@ -114,18 +115,34 @@ export function MahasiswaForm({ defaultValues, onSuccess }: MahasiswaFormProps) 
         ? mahasiswaService.update(defaultValues!.id, data)
         : mahasiswaService.create(data),
     onSuccess: (_, variables) => {
-      toast.success(isEdit ? "Mahasiswa berhasil diperbarui" : "Mahasiswa berhasil ditambahkan");
+      const assignedDiv = divisiList.find((d) => d.id === variables.divisi);
+      const assignedPmb = pembimbingList.find((p) => p.id === variables.pembimbing);
+      const assignedCab = (cabangList as Cabang[]).find((c) => c.id === variables.cabang);
+
+      const divisiName = assignedDiv ? assignedDiv.nama_divisi : variables.divisi;
+      const pembimbingName = assignedPmb ? assignedPmb.nama : variables.pembimbing;
+      const unitName = assignedCab ? assignedCab.nama_cabang : "PLN ULP";
+
+      // Generate clean WhatsApp direct message URL
+      const waUrl = getWhatsAppNotificationLink({
+        nomorHp: variables.nomor_hp,
+        nama: variables.nama,
+        type: "update_penempatan",
+        unitName,
+        divisiName,
+        pembimbingName,
+      });
+
+      toast.success(isEdit ? "Mahasiswa & penempatan berhasil diperbarui" : "Mahasiswa berhasil ditambahkan", {
+        action: {
+          label: "📱 Kirim WA",
+          onClick: () => window.open(waUrl, "_blank"),
+        },
+        duration: 8000,
+      });
 
       // Send email & in-app notification for Update Penempatan
       if (variables.email) {
-        const assignedDiv = divisiList.find((d) => d.id === variables.divisi);
-        const assignedPmb = pembimbingList.find((p) => p.id === variables.pembimbing);
-        const assignedCab = (cabangList as Cabang[]).find((c) => c.id === variables.cabang);
-
-        const divisiName = assignedDiv ? assignedDiv.nama_divisi : variables.divisi;
-        const pembimbingName = assignedPmb ? assignedPmb.nama : variables.pembimbing;
-        const unitName = assignedCab ? assignedCab.nama_cabang : "PLN ULP";
-
         fetch("/api/email/send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -138,12 +155,18 @@ export function MahasiswaForm({ defaultValues, onSuccess }: MahasiswaFormProps) 
             pembimbingName,
           }),
         }).catch((e) => console.error("Failed to send update penempatan email", e));
+
         dashboardService.pushNotification({
           title: isAdminUlp ? "Verifikasi Mahasiswa ULP Berhasil" : "Data Mahasiswa Diperbarui",
           message: `Data mahasiswa ${variables.nama} berhasil diverifikasi (Pembimbing: ${pembimbingName}).`,
           type: "success",
           role: isAdminUlp ? "admin_ulp" : "admin",
         });
+      }
+
+      // Automatically open WhatsApp direct window
+      if (variables.nomor_hp) {
+        window.open(waUrl, "_blank");
       }
 
       onSuccess();

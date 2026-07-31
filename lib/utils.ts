@@ -78,12 +78,63 @@ export function calcProgress(start: string, end: string): number {
 }
 
 /** Format bytes to human readable */
-export function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
+export function formatBytes(bytes: number, decimals = 2): string {
+  if (bytes === 0) return "0 Bytes";
   const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
+
+/** Helper generator for WhatsApp direct notification link (clean text without garbled emojis) */
+export function getWhatsAppNotificationLink(options: {
+  nomorHp?: string;
+  nama: string;
+  type: "diterima" | "ditolak" | "update_penempatan";
+  unitName: string;
+  divisiName?: string;
+  pembimbingName?: string;
+  tanggalMulai?: string;
+  tanggalSelesai?: string;
+  alasanTolak?: string;
+}): string {
+  let rawHp = String(options.nomorHp || "").replace(/[^0-9]/g, "");
+  if (!rawHp) rawHp = "6282170366479";
+  if (rawHp.startsWith("0")) rawHp = "62" + rawHp.substring(1);
+  if (!rawHp.startsWith("62")) rawHp = "62" + rawHp;
+
+  let text = "";
+  if (options.type === "diterima") {
+    text = `*PEMBERITAHUAN PENERIMAAN MAGANG PLN UP3 PADANG*\n\n` +
+      `Selamat! Lamaran Magang atas nama *${options.nama}* di PT PLN (Persero) telah *DITERIMA*.\n\n` +
+      `*Detail Penempatan*:\n` +
+      `• Unit: *${options.unitName}*\n` +
+      `• Divisi: *${options.divisiName || "Akan Ditentukan"}*\n` +
+      `• Pembimbing: *${options.pembimbingName || "Akan Ditentukan"}*\n` +
+      `• Periode: ${formatDate(options.tanggalMulai)} s/d ${formatDate(options.tanggalSelesai)}\n\n` +
+      `*Silakan cek Email Anda atau login ke platform PIJAR untuk mengunduh Surat Balasan Resmi Penerimaan Magang Anda.*\n\n` +
+      `Terima kasih!`;
+  } else if (options.type === "update_penempatan") {
+    text = `*UPDATE PENEMPATAN MAGANG PLN UP3 PADANG*\n\n` +
+      `Halo Kak *${options.nama}*,\n` +
+      `Informasi penempatan divisi dan pembimbing magang Anda di *${options.unitName}* telah resmi diperbarui.\n\n` +
+      `*Detail Penempatan Terbaru*:\n` +
+      `• Unit Penempatan: *${options.unitName}*\n` +
+      `• Divisi: *${options.divisiName || "Belum Ditentukan"}*\n` +
+      `• Pembimbing Lapangan: *${options.pembimbingName || "Belum Ditentukan"}*\n\n` +
+      `*Silakan login ke aplikasi PIJAR untuk melihat tugas dan melakukan koordinasi dengan Pembimbing Lapangan Anda.*\n\n` +
+      `Terima kasih!`;
+  } else {
+    text = `*PEMBERITAHUAN LAMARAN MAGANG PLN UP3 PADANG*\n\n` +
+      `Halo Kak *${options.nama}*,\n` +
+      `Terima kasih telah mengajukan lamaran magang di PT PLN (Persero) UP3 Padang.\n\n` +
+      `Mohon maaf, lamaran magang Anda saat ini *BELUM DAPAT DITERIMA*.\n` +
+      `*Alasan*: ${options.alasanTolak || "Kapasitas kuota penempatan penuh"}\n\n` +
+      `Tetap semangat dan sukses selalu!`;
+  }
+
+  return `https://wa.me/${rawHp}?text=${encodeURIComponent(text)}`;
 }
 
 /** Generate unique ID */
