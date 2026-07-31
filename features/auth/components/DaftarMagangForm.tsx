@@ -32,15 +32,24 @@ const magangSchema = z
     path: ["tanggal_selesai"],
   })
   .refine((d) => {
+    if (!d.tanggal_selesai) return true;
+    const end = new Date(d.tanggal_selesai);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return end >= today;
+  }, {
+    message: "Periode magang telah berakhir. Pendaftaran hanya untuk program magang yang sedang atau akan berlangsung.",
+    path: ["tanggal_selesai"],
+  })
+  .refine((d) => {
     if (!d.tanggal_mulai || !d.tanggal_selesai) return true;
     const start = new Date(d.tanggal_mulai);
     const end = new Date(d.tanggal_selesai);
     if (isNaN(start.getTime()) || isNaN(end.getTime())) return true;
-    const minEnd = new Date(start);
-    minEnd.setMonth(minEnd.getMonth() + 2);
-    return end >= minEnd;
+    const diffDays = Math.round((end.getTime() - start.getTime()) / (1000 * 3600 * 24));
+    return diffDays >= 45; // Minimal 45 hari
   }, {
-    message: "Durasi periode magang minimal adalah 2 bulan",
+    message: "Durasi periode magang minimal adalah 45 hari",
     path: ["tanggal_selesai"],
   });
 
@@ -348,6 +357,13 @@ export function DaftarMagangForm() {
       return;
     }
     setFileErrors({});
+
+    const totalBytes = suratAjuan.file.size + cv.file.size + proposal.file.size;
+    const totalMB = totalBytes / (1024 * 1024);
+    if (totalMB > 4.2) {
+      toast.error(`Total ukuran file (${totalMB.toFixed(1)} MB) melebihi batas sistem 4.2 MB. Harap perkecil/kompres file PDF/gambar Anda sebelum mengunggah.`);
+      return;
+    }
 
     setIsSubmitting(true);
     try {

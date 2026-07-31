@@ -178,7 +178,8 @@ export function getLamaranAcceptedTemplate(
   suratPenerimaanUrl?: string
 ): { subject: string; html: string } {
   const subject = "Selamat! Lamaran Magang Anda Diterima";
-  const downloadLink = suratPenerimaanUrl || "http://localhost:3000/login";
+  const APP_BASE = process.env.NEXT_PUBLIC_APP_URL || "https://pijar-magang.vercel.app";
+  const downloadLink = suratPenerimaanUrl || `${APP_BASE}/login`;
 
   const bodyContent = `
     <p style="font-size: 16px; font-weight: 600; color: #2d3748;">Halo ${nama},</p>
@@ -225,7 +226,7 @@ export function getLamaranAcceptedTemplate(
     </ul>
 
     <div style="text-align: center; margin-top: 20px;">
-      <a href="http://localhost:3000/login" class="btn-action" target="_blank">Login ke PIJAR</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://pijar-magang.vercel.app"}/login" class="btn-action" target="_blank">Login ke PIJAR</a>
     </div>
 
     <br>
@@ -286,9 +287,9 @@ export function getAccountCreatedTemplate({
     </p>
 
     <div style="text-align: center; margin-top: 24px;">
-      <a href="http://localhost:3000/login" class="btn-action" target="_blank">Login ke Aplikasi PIJAR</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://pijar-magang.vercel.app"}/login" class="btn-action" target="_blank">Login ke Aplikasi PIJAR</a>
     </div>
-
+ 
     <br>
     <p style="margin-bottom: 0;">Salam,<br><strong>Tim PIJAR</strong><br>PT PLN (Persero) UP3 Padang</p>
   `;
@@ -334,7 +335,7 @@ export function getUpdatePenempatanTemplate({
     <p>Silakan login ke aplikasi <strong>PIJAR</strong> untuk melihat detail tugas dan melakukan koordinasi dengan Pembimbing Lapangan Anda.</p>
 
     <div style="text-align: center; margin-top: 20px;">
-      <a href="http://localhost:3000/login" class="btn-action" target="_blank">Login ke PIJAR</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://pijar-magang.vercel.app"}/login" class="btn-action" target="_blank">Login ke PIJAR</a>
     </div>
 
     <br>

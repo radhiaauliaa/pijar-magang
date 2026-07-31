@@ -604,25 +604,15 @@ export function AbsensiMahasiswaPage() {
               disabled={!canCheckIn}
             />
 
-            <div className="flex gap-2">
+            <div className="w-full">
               <Button
                 variant="outline"
-                className="flex-1 text-xs"
+                className="w-full text-xs font-bold border-emerald-600/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
                 onClick={() => setShowCameraMasuk(true)}
                 disabled={!canCheckIn}
               >
-                <Camera className="w-3.5 h-3.5 mr-1.5" />
-                Aktifkan Kamera
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 text-xs"
-                onClick={() => uploadMasukRef.current?.click()}
-                disabled={!canCheckIn}
-              >
-                <Upload className="w-3.5 h-3.5 mr-1.5" />
-                Upload Foto
+                <Camera className="w-4 h-4 mr-2" />
+                Ambil Foto Selfie (Kamera)
               </Button>
             </div>
 
@@ -698,25 +688,15 @@ export function AbsensiMahasiswaPage() {
               disabled={!canCheckOut}
             />
 
-            <div className="flex gap-2">
+            <div className="w-full">
               <Button
                 variant="outline"
-                className="flex-1 text-xs"
+                className="w-full text-xs font-bold border-rose-600/40 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
                 onClick={() => setShowCameraPulang(true)}
                 disabled={!canCheckOut}
               >
-                <Camera className="w-3.5 h-3.5 mr-1.5" />
-                Aktifkan Kamera
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 text-xs"
-                onClick={() => uploadPulangRef.current?.click()}
-                disabled={!canCheckOut}
-              >
-                <Upload className="w-3.5 h-3.5 mr-1.5" />
-                Upload Foto
+                <Camera className="w-4 h-4 mr-2" />
+                Ambil Foto Selfie (Kamera)
               </Button>
             </div>
 

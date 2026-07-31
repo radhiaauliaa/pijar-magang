@@ -38,6 +38,7 @@ export function MahasiswaPage() {
   const [editTarget, setEditTarget] = useState<Mahasiswa | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Mahasiswa | null>(null);
 
+  const [showAllDivisi, setShowAllDivisi] = useState(false);
   const debouncedSearch = useDebounce(search, 400);
 
   const { data, isLoading } = useQuery({
@@ -58,14 +59,21 @@ export function MahasiswaPage() {
         const isPembimbingMatch =
           mhs.pembimbing === user.id ||
           mhs.pembimbing === user.email ||
+          mhs.pembimbing === user.nama ||
           (user.id && mhs.pembimbing && String(mhs.pembimbing).toLowerCase() === String(user.id).toLowerCase()) ||
-          (user.email && mhs.pembimbing && String(mhs.pembimbing).toLowerCase() === String(user.email).toLowerCase());
-        const isDivisiMatch = user.divisi && mhs.divisi === user.divisi;
-        return isPembimbingMatch || isDivisiMatch;
+          (user.email && mhs.pembimbing && String(mhs.pembimbing).toLowerCase() === String(user.email).toLowerCase()) ||
+          (user.nama && mhs.pembimbing && String(mhs.pembimbing).toLowerCase() === String(user.nama).toLowerCase());
+
+        if (showAllDivisi) {
+          const isDivisiMatch = user.divisi && (mhs.divisi === user.divisi || (mhs as any).divisi_id === user.divisi);
+          return isPembimbingMatch || isDivisiMatch;
+        }
+
+        return isPembimbingMatch;
       });
     }
     return rawItems;
-  }, [rawItems, user]);
+  }, [rawItems, user, showAllDivisi]);
 
   const { data: divisiList = [] } = useQuery({
     queryKey: ["divisi"],
@@ -291,11 +299,22 @@ export function MahasiswaPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Status</SelectItem>
-            <SelectItem value="aktif">Aktif</SelectItem>
-            <SelectItem value="selesai">Selesai</SelectItem>
-            <SelectItem value="dropout">Dropout</SelectItem>
+            <SelectItem value="Aktif">Aktif</SelectItem>
+            <SelectItem value="Selesai">Selesai</SelectItem>
+            <SelectItem value="Nonaktif">Nonaktif</SelectItem>
           </SelectContent>
         </Select>
+
+        {user?.role === "pembimbing" && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-10 text-xs font-bold border-sky-600/40 text-sky-700 dark:text-sky-400 bg-sky-50/50 dark:bg-sky-950/20 shrink-0"
+            onClick={() => setShowAllDivisi(!showAllDivisi)}
+          >
+            {showAllDivisi ? "🏢 Tampil: Semua Divisi" : "👤 Tampil: Bimbingan Saya"}
+          </Button>
+        )}
       </div>
 
       <DataTable

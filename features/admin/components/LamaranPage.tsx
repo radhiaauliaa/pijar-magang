@@ -126,8 +126,8 @@ function ApproveModal({ lamaran, onClose, onSuccessOpenWA }: ApproveModalProps) 
 
   // Filter supervisors strictly by chosen Divisi and Cabang
   const filteredPembimbingList = pembimbingList.filter((p) => {
-    if (divisi && p.divisi !== divisi) return false;
-    if (cabang && p.cabang !== cabang) return false;
+    if (divisi && p.divisi !== divisi && (p as any).divisi_id !== divisi) return false;
+    if (cabang && p.cabang !== cabang && (p as any).cabang_id !== cabang && (p as any).ulp_id !== cabang) return false;
     return true;
   });
 
@@ -347,7 +347,7 @@ function ApproveModal({ lamaran, onClose, onSuccessOpenWA }: ApproveModalProps) 
                 <SelectContent>
                   {filteredPembimbingList.length > 0 ? (
                     filteredPembimbingList.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>{p.nama} ({p.divisi} - {p.cabang})</SelectItem>
+                      <SelectItem key={p.id} value={p.id}>{p.nama}</SelectItem>
                     ))
                   ) : (
                     <div className="p-3 text-xs text-muted-foreground text-center font-medium">
