@@ -88,6 +88,8 @@ Sistem PIJAR menerapkan **Role-Based Access Control (RBAC)** ketat yang membagi 
 
 ---
 
+---
+
 ## Panduan Instalasi & Jalankan Lokal
 
 ### 1. Prerequisites (Prasyarat)
@@ -127,6 +129,24 @@ EMAIL_PASS="your_gmail_app_password_here"
 
 # WhatsApp Direct Notification Default Fallback Phone Number
 NEXT_PUBLIC_DEFAULT_WA_NUMBER="628xxxxxxxxxx"
+```
+
+### 4. Jalankan Development Server
+```bash
+npm run dev
+```
+Buka browser dan akses alamat: `http://localhost:3000`
+
+### 5. Pemeriksaan Tipe & Build Production
+```bash
+# Jalankan verifikasi TypeScript
+npm run type-check
+
+# Build proyek untuk produksi
+npm run build
+
+# Jalankan server produksi
+npm run start
 ```
 
 ## Struktur Arsitektur & Direktori Proyek
@@ -354,67 +374,6 @@ monitoring-magang/
 
 ---
 
-## Panduan Instalasi & Jalankan Lokal
-
-### 1. Prerequisites (Prasyarat)
-Pastikan perangkat komputer Anda sudah terinstal:
-- **Node.js:** v18.0.0 atau versi lebih baru.
-- **npm:** v9.0.0 atau **pnpm** / **yarn**.
-
-### 2. Clone Repository & Install Dependencies
-```bash
-# Clone repository
-git clone https://github.com/username/monitoring-magang.git
-
-# Masuk ke direktori proyek
-cd monitoring-magang
-
-# Install seluruh dependensi
-npm install
-```
-
-### 3. Konfigurasi Environment Variables (`.env.local`)
-Buat berkas `.env.local` pada root direktori proyek dan isikan variabel berikut dengan nilai rahasia Anda:
-
-```env
-# URL Google Apps Script Web App Deployment
-NEXT_PUBLIC_API_URL="your_google_apps_script_web_app_url_here"
-
-# JWT Secret Key (bebas/random string)
-JWT_SECRET="your_jwt_secret_here"
-
-# Google OAuth Client ID (opsional untuk Google Sign-In)
-NEXT_PUBLIC_GOOGLE_CLIENT_ID="your_google_client_id_here"
-
-# Email Gateway Credentials (Gmail App Password)
-EMAIL_USER="your_email@gmail.com"
-EMAIL_FROM="PIJAR Internship <your_email@gmail.com>"
-EMAIL_PASS="your_gmail_app_password_here"
-
-# WhatsApp Direct Notification Default Fallback Phone Number
-NEXT_PUBLIC_DEFAULT_WA_NUMBER="628xxxxxxxxxx"
-```
-
-### 4. Jalankan Development Server
-```bash
-npm run dev
-```
-Buka browser dan akses alamat: `http://localhost:3000`
-
-### 5. Pemeriksaan Tipe & Build Production
-```bash
-# Jalankan verifikasi TypeScript
-npm run type-check
-
-# Build proyek untuk produksi
-npm run build
-
-# Jalankan server produksi
-npm run start
-```
-
----
-
 ## Konfigurasi Backend Google Apps Script (GAS)
 
 Backend aplikasi ini menggunakan **Google Apps Script** gratis tanpa biaya server (*Serverless Architecture*).
@@ -428,23 +387,6 @@ Backend aplikasi ini menggunakan **Google Apps Script** gratis tanpa biaya serve
    - Execute as: **Me**
    - Who has access: **Anyone**
 6. Salin **Web App URL** yang dihasilkan dan tempelkan ke variabel `NEXT_PUBLIC_API_URL` di berkas `.env.local`.
-
----
-
-## Daftar Akun Pengujian (Testing Accounts)
-
-Untuk mempermudah pengujian seluruh fitur dan alur kerja aplikasi, Anda dapat menggunakan akun terdaftar di bawah ini:
-
-| Peran (Role) | Email | Password | Keterangan |
-| :--- | :--- | :--- | :--- |
-| **Admin Utama UP3** | `magangplnup3pdg@gmail.com` | *(Password Admin)* | Akses penuh ke seluruh sistem & lamaran |
-| **Admin ULP Cabang** | `archivepage00@gmail.com` | *(Password ULP)* | Kelola mahasiswa & pembimbing ULP |
-| **Pembimbing / Supervisor** | `nanda@gmail.com` | *(Password Pembimbing)* | Verifikasi jurnal & absensi divisi |
-| **Pembimbing / Supervisor** | `panjul@gmail.com` | *(Password Pembimbing)* | Verifikasi jurnal & absensi divisi |
-| **Mahasiswa Magang** | `radhiaaulia993@gmail.com` | *(Password Mahasiswa)* | Akses absensi selfie & jurnal harian |
-| **Mahasiswa Magang** | `radhiaulian@gmail.com` | *(Password Mahasiswa)* | Akses absensi selfie & jurnal harian |
-
-> **Tips:** Sistem dilengkapi fitur **Live Role Detection** pada form login. Saat Anda mengetikkan email di atas, indikator role akan secara otomatis menyorot status role pengguna secara *real-time* dari database!
 
 ---
 
