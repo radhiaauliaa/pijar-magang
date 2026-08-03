@@ -152,7 +152,7 @@ function HeroSection() {
       <div className="absolute -top-44 -right-28 w-[420px] h-[420px] rounded-full bg-[#eaf4fc] opacity-90 pointer-events-none z-0" />
       <div className="absolute -bottom-32 -left-32 w-[440px] h-[440px] rounded-full bg-[#eaf4fc] opacity-80 pointer-events-none z-0" />
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-start gap-12 pt-2">
           <div className="lg:col-span-6 space-y-6 text-left">
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-black text-[#103956] tracking-tight leading-none">
               PIJAR
@@ -199,8 +199,8 @@ function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: Hero Illustration */}
-          <div className="lg:col-span-6 flex items-center justify-center">
+          {/* Right Column: Hero Illustration (Raised to match top title) */}
+          <div className="lg:col-span-6 flex items-center justify-center lg:-mt-8">
             <div className="relative w-full max-w-[540px] flex justify-center items-center">
               <img
                 src="/ilustrasi_pijar3.png"
