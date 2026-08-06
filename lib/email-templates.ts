@@ -167,6 +167,36 @@ export function getLamaranSubmittedTemplate(nama: string): { subject: string; ht
   return { subject, html: getBaseWrapper({ title: subject, bodyContent }) };
 }
 
+export function formatDateIndonesian(dateStr?: string): string {
+  if (!dateStr || !dateStr.trim() || dateStr === "-") return "-";
+  try {
+    const raw = dateStr.trim();
+    let d: Date;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      const parts = raw.split("-");
+      d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    } else {
+      d = new Date(raw);
+    }
+    if (isNaN(d.getTime())) return raw;
+
+    const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const months = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    const dayName = days[d.getDay()];
+    const dayDate = d.getDate();
+    const monthName = months[d.getMonth()];
+    const year = d.getFullYear();
+
+    return `${dayName}, ${dayDate} ${monthName} ${year}`;
+  } catch (e) {
+    return dateStr;
+  }
+}
+
 // Template Lamaran Diterima Email
 export function getLamaranAcceptedTemplate(
   nama: string,
@@ -179,7 +209,10 @@ export function getLamaranAcceptedTemplate(
 ): { subject: string; html: string } {
   const subject = "Selamat! Lamaran Magang Anda Diterima";
   const APP_BASE = process.env.NEXT_PUBLIC_APP_URL || "https://pijar-magang.vercel.app";
-  const downloadLink = suratPenerimaanUrl || `${APP_BASE}/login`;
+  const downloadLink = (suratPenerimaanUrl && suratPenerimaanUrl.trim()) ? suratPenerimaanUrl : `${APP_BASE}/login`;
+
+  const fmtMulai = formatDateIndonesian(tanggalMulai);
+  const fmtSelesai = formatDateIndonesian(tanggalSelesai);
 
   const bodyContent = `
     <p style="font-size: 16px; font-weight: 600; color: #2d3748;">Halo ${nama},</p>
@@ -203,26 +236,20 @@ export function getLamaranAcceptedTemplate(
         </tr>
         <tr>
           <td style="padding: 6px 0; color: #718096;">Tanggal Mulai:</td>
-          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${tanggalMulai || "-"}</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${fmtMulai}</td>
         </tr>
         <tr>
           <td style="padding: 6px 0; color: #718096;">Tanggal Selesai:</td>
-          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${tanggalSelesai || "-"}</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${fmtSelesai}</td>
         </tr>
       </table>
     </div>
 
-    ${
-      suratPenerimaanUrl && suratPenerimaanUrl.trim()
-        ? `<div style="background-color: #ebf8ff; border: 1px dashed #2b6cb0; border-radius: 10px; padding: 18px; margin: 24px 0; text-align: center;">
-             <p style="margin: 0 0 6px 0; font-size: 15px; font-weight: 800; color: #2b6cb0;">📄 Surat Balasan Resmi Penerimaan Magang</p>
-             <p style="margin: 0 0 14px 0; font-size: 13px; color: #4a5568;">Berikut terlampir dokumen Surat Penerimaan Resmi dari PT PLN (Persero) UP3 Padang. Klik tombol di bawah ini untuk melihat/mengunduh surat Anda:</p>
-             <a href="${suratPenerimaanUrl}" class="btn-action" style="background-color: #2b6cb0; font-size: 14px;" target="_blank">📄 Unduh Surat Penerimaan (PDF)</a>
-           </div>`
-        : `<div style="background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin: 20px 0; text-align: center;">
-             <p style="margin: 0; font-size: 13px; color: #4a5568;">Dokumen Surat Penerimaan Resmi PDF Anda dapat diunduh melalui Dashboard Mahasiswa setelah Anda login.</p>
-           </div>`
-    }
+    <div style="background-color: #ebf8ff; border: 1px dashed #2b6cb0; border-radius: 10px; padding: 18px; margin: 24px 0; text-align: center;">
+      <p style="margin: 0 0 6px 0; font-size: 15px; font-weight: 800; color: #2b6cb0;">📄 Surat Balasan Resmi Penerimaan Magang</p>
+      <p style="margin: 0 0 14px 0; font-size: 13px; color: #4a5568;">Berikut terlampir dokumen Surat Penerimaan Resmi dari PT PLN (Persero) UP3 Padang. Klik tombol di bawah ini untuk melihat/mengunduh surat Anda:</p>
+      <a href="${downloadLink}" class="btn-action" style="background-color: #2b6cb0; font-size: 14px;" target="_blank">📄 Unduh Surat Penerimaan (PDF)</a>
+    </div>
 
     <p>Silakan login ke aplikasi <strong>PIJAR</strong> untuk mulai menggunakan seluruh fitur magang terpadu:</p>
     <ul style="padding-left: 20px; color: #4a5568;">
@@ -415,7 +442,6 @@ export function getAccountDeactivatedTemplate(nama: string): { subject: string; 
   return { subject, html: getBaseWrapper({ title: subject, bodyContent }) };
 }
 
-// Template Disposisi Mahasiswa Baru ke Admin ULP
 export function getUlpTransferNoticeTemplate({
   adminName,
   ulpName,
@@ -434,6 +460,8 @@ export function getUlpTransferNoticeTemplate({
   tanggalSelesai?: string;
 }): { subject: string; html: string } {
   const subject = `[PIJAR] Disposisi Mahasiswa Magang Baru di ${ulpName}`;
+  const fmtMulai = formatDateIndonesian(tanggalMulai);
+  const fmtSelesai = formatDateIndonesian(tanggalSelesai);
   const bodyContent = `
     <p style="font-size: 16px; font-weight: 600; color: #2d3748;">Halo ${adminName},</p>
     <p>Admin UP3 Padang telah mendisposisikan 1 mahasiswa magang baru ke unit Anda (<strong>${ulpName}</strong>).</p>
@@ -451,7 +479,7 @@ export function getUlpTransferNoticeTemplate({
         </tr>
         <tr>
           <td style="padding: 6px 0; color: #718096;">Periode Magang:</td>
-          <td style="padding: 6px 0; font-weight: bold; color: #005BAC;">${tanggalMulai || "-"} s/d ${tanggalSelesai || "-"}</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #005BAC;">${fmtMulai} s/d ${fmtSelesai}</td>
         </tr>
       </table>
     </div>
@@ -490,6 +518,8 @@ export function getNewStudentAssignedToPembimbingTemplate({
   tanggalSelesai?: string;
 }): { subject: string; html: string } {
   const subject = `[PIJAR] Mahasiswa Bimbingan Magang Baru: ${mhsNama}`;
+  const fmtMulai = formatDateIndonesian(tanggalMulai);
+  const fmtSelesai = formatDateIndonesian(tanggalSelesai);
   const bodyContent = `
     <p style="font-size: 16px; font-weight: 600; color: #2d3748;">Halo ${pembimbingNama},</p>
     <p>Anda telah ditunjuk sebagai Pembimbing Lapangan untuk mahasiswa magang baru pada sistem <strong>PIJAR (PT PLN (Persero) UP3 Padang)</strong>.</p>
@@ -511,7 +541,7 @@ export function getNewStudentAssignedToPembimbingTemplate({
         </tr>
         <tr>
           <td style="padding: 6px 0; color: #718096;">Periode Magang:</td>
-          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${tanggalMulai || "-"} s/d ${tanggalSelesai || "-"}</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${fmtMulai} s/d ${fmtSelesai}</td>
         </tr>
       </table>
     </div>

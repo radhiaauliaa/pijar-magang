@@ -1,7 +1,7 @@
 // features/mahasiswa/components/MahasiswaDashboard.tsx
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Clock, TrendingUp, Calendar, Building2, Briefcase, UserCheck } from "lucide-react";
+import { BookOpen, Clock, TrendingUp, Calendar, Building2, Briefcase, UserCheck, FileText } from "lucide-react";
 import { dashboardService } from "@/services/dashboard.service";
 import { StatCard } from "@/components/shared/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -117,6 +117,36 @@ export function MahasiswaDashboard() {
           </Card>
         );
       })()}
+
+      {/* Official Acceptance Letter PDF Download Banner */}
+      {stats?.surat_penerimaan_url && (
+        <Card className="bg-blue-50/80 dark:bg-blue-950/20 border-2 border-blue-200 dark:border-blue-800/60 rounded-2xl overflow-hidden shadow-xs">
+          <CardContent className="p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                <FileText className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base sm:text-lg text-blue-950 dark:text-blue-200 tracking-tight">
+                  Surat Balasan Resmi Penerimaan Magang
+                </h3>
+                <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 font-medium">
+                  Dokumen persetujuan resmi dari PT PLN (Persero) UP3 Padang
+                </p>
+              </div>
+            </div>
+            <a
+              href={stats.surat_penerimaan_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-all shadow-sm hover:shadow-md shrink-0"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Unduh Surat Penerimaan (PDF)</span>
+            </a>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">

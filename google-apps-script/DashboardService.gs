@@ -135,11 +135,12 @@ var DashboardService = (function() {
       return p ? (p.nama || val) : val;
     }
 
-    if (!mhs) {
-      var lmr = null;
-      if (email) lmr = SpreadsheetRepo.findOneBy('Lamaran', 'email', email);
-      if (!lmr && userId) lmr = SpreadsheetRepo.findOneBy('Lamaran', 'user_id', userId);
+    var lmr = null;
+    if (email) lmr = SpreadsheetRepo.findOneBy('Lamaran', 'email', email);
+    if (!lmr && userId) lmr = SpreadsheetRepo.findOneBy('Lamaran', 'user_id', userId);
+    var suratPenerimaanUrl = (mhs && mhs.surat_penerimaan_url) ? mhs.surat_penerimaan_url : (lmr ? (lmr.surat_penerimaan_url || '') : '');
 
+    if (!mhs) {
       return success({
         progress_magang: 0,
         total_jurnal: 0,
@@ -148,6 +149,7 @@ var DashboardService = (function() {
         divisi: lmr ? resolveDivisi(lmr.divisi) : '',
         cabang: lmr ? resolveCabang(lmr.cabang) : '',
         pembimbing_nama: lmr ? resolvePembimbing(lmr.pembimbing) : '',
+        surat_penerimaan_url: suratPenerimaanUrl,
       });
     }
 
@@ -178,6 +180,7 @@ var DashboardService = (function() {
       divisi: resolveDivisi(mhs.divisi),
       cabang: resolveCabang(mhs.cabang),
       pembimbing_nama: resolvePembimbing(mhs.pembimbing),
+      surat_penerimaan_url: suratPenerimaanUrl,
     });
   }
 

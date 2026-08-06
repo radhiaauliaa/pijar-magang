@@ -339,6 +339,7 @@ export interface MahasiswaStats {
   divisi?: string;
   cabang?: string;
   pembimbing_nama?: string;
+  surat_penerimaan_url?: string;
 }
 
 // Filter & Query
