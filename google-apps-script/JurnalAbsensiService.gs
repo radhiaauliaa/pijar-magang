@@ -269,6 +269,24 @@ var AbsensiService = (function() {
     return getAll(Object.assign({}, params, { mahasiswa_id: mhs.id }), currentUser);
   }
 
+  function _getTodayStr() {
+    return Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd");
+  }
+
+  function _isSameDate(rowTanggal, targetDateStr) {
+    if (!rowTanggal) return false;
+    var kDate = String(rowTanggal || '').slice(0, 10);
+    if (kDate === targetDateStr) return true;
+    try {
+      var d = new Date(rowTanggal);
+      if (!isNaN(d.getTime())) {
+        var dStr = Utilities.formatDate(d, "GMT+7", "yyyy-MM-dd");
+        if (dStr === targetDateStr) return true;
+      }
+    } catch(e){}
+    return false;
+  }
+
   function getToday(currentUser) {
     var mhs = SpreadsheetRepo.findOneBy('Mahasiswa', 'email', currentUser.email);
     if (!mhs) {
@@ -276,17 +294,11 @@ var AbsensiService = (function() {
       if (userDb) mhs = SpreadsheetRepo.findOneBy('Mahasiswa', 'user_id', userDb.id);
     }
     if (!mhs) return success(null, 'OK');
-    var todayStr = Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd");
+    var todayStr = _getTodayStr();
     var list = SpreadsheetRepo.getAll(SHEET).filter(function(k) {
       var isMhs = k.mahasiswa_id === mhs.id || (mhs.user_id && k.mahasiswa_id === mhs.user_id) || k.mahasiswa_id === mhs.email;
       if (!isMhs) return false;
-      var kDate = String(k.tanggal || '').slice(0, 10);
-      try {
-        var d = new Date(k.tanggal);
-        var dStr = Utilities.formatDate(d, "GMT+7", "yyyy-MM-dd");
-        if (dStr === todayStr) return true;
-      } catch(e){}
-      return kDate === todayStr;
+      return _isSameDate(k.tanggal, todayStr);
     });
     return success(list.length > 0 ? list[list.length - 1] : null, 'OK');
   }
@@ -299,11 +311,10 @@ var AbsensiService = (function() {
     }
     if (!mhs) return error('Data mahasiswa tidak ditemukan');
 
-    var today = new Date().toISOString().split('T')[0];
+    var today = _getTodayStr();
     var existing = SpreadsheetRepo.getAll(SHEET).filter(function(k) {
-      var kDate = String(k.tanggal || '').slice(0, 10);
       var isMhs = k.mahasiswa_id === mhs.id || (mhs.user_id && k.mahasiswa_id === mhs.user_id) || k.mahasiswa_id === mhs.email;
-      return isMhs && kDate === today;
+      return isMhs && _isSameDate(k.tanggal, today);
     });
     if (existing.length > 0) {
       var ex = existing[0];
@@ -313,10 +324,10 @@ var AbsensiService = (function() {
     }
 
     var now = new Date();
-    var jamMasuk = now.toTimeString().slice(0, 5);
-    var hour = now.getHours();
-    var minute = now.getMinutes();
-    var day = now.getDay();
+    var jamMasuk = Utilities.formatDate(now, "GMT+7", "HH:mm");
+    var hour = parseInt(Utilities.formatDate(now, "GMT+7", "HH"), 10);
+    var minute = parseInt(Utilities.formatDate(now, "GMT+7", "mm"), 10);
+    var day = parseInt(Utilities.formatDate(now, "GMT+7", "u"), 10); // 1 = Mon, 5 = Fri, 7 = Sun
 
     var isLate = false;
     if (day === 5) {
@@ -361,11 +372,10 @@ var AbsensiService = (function() {
     }
     if (!mhs) return error('Data mahasiswa tidak ditemukan');
 
-    var today = new Date().toISOString().split('T')[0];
+    var today = _getTodayStr();
     var list = SpreadsheetRepo.getAll(SHEET).filter(function(k) {
-      var kDate = String(k.tanggal || '').slice(0, 10);
       var isMhs = k.mahasiswa_id === mhs.id || (mhs.user_id && k.mahasiswa_id === mhs.user_id) || k.mahasiswa_id === mhs.email;
-      return isMhs && kDate === today;
+      return isMhs && _isSameDate(k.tanggal, today);
     });
     if (list.length === 0) return error('Anda belum melakukan check-in hari ini');
     var existing = list[0];
@@ -374,11 +384,11 @@ var AbsensiService = (function() {
     }
 
     var now = new Date();
-    var hour = now.getHours();
+    var hour = parseInt(Utilities.formatDate(now, "GMT+7", "HH"), 10);
     if (hour >= 20) {
       return error('Batas waktu absen pulang (pukul 20:00) telah berakhir!');
     }
-    var jamPulang = now.toTimeString().slice(0, 5);
+    var jamPulang = Utilities.formatDate(now, "GMT+7", "HH:mm");
 
     var fotoUrl = '';
     if (params.foto) {
@@ -402,11 +412,10 @@ var AbsensiService = (function() {
     }
     if (!mhs) return error('Data mahasiswa tidak ditemukan');
 
-    var today = new Date().toISOString().split('T')[0];
+    var today = _getTodayStr();
     var existing = SpreadsheetRepo.getAll(SHEET).filter(function(k) {
-      var kDate = String(k.tanggal || '').slice(0, 10);
       var isMhs = k.mahasiswa_id === mhs.id || (mhs.user_id && k.mahasiswa_id === mhs.user_id) || k.mahasiswa_id === mhs.email;
-      return isMhs && kDate === today;
+      return isMhs && _isSameDate(k.tanggal, today);
     });
     if (existing.length > 0) {
       return error('Anda sudah melakukan absensi atau mengajukan izin hari ini!');
