@@ -15,7 +15,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = verifyOTP(email, code);
+    const backupToken = request.cookies.get("mm_otp_token")?.value || body.otpToken;
+    const result = verifyOTP(email, code, backupToken);
 
     if (!result.success) {
       return NextResponse.json(

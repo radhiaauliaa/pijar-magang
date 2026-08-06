@@ -1,6 +1,6 @@
 // app/api/otp/send/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { generateOTP } from "@/lib/otp-store";
+import { generateOTP, createOTPToken } from "@/lib/otp-store";
 import { sendEmail } from "@/lib/mailer";
 import { getOTPEmailTemplate } from "@/lib/email-templates";
 import { addNotification } from "@/lib/notifications-store";
@@ -35,11 +35,24 @@ export async function POST(request: NextRequest) {
       user_email: normalizedEmail,
     });
 
-    return NextResponse.json({
+    const otpToken = createOTPToken(normalizedEmail, otpCode);
+
+    const response = NextResponse.json({
       success: true,
       message: "Kode OTP verifikasi telah dikirimkan ke email Anda.",
       details: emailResult.message,
+      otpToken,
     });
+
+    response.cookies.set("mm_otp_token", otpToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 300, // 5 minutes
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
     console.error("[API OTP Send Error]", error);
     return NextResponse.json(

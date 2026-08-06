@@ -31,7 +31,10 @@ var DashboardService = (function() {
       userCabangId = ulpObj ? ulpObj.id : 'NO_ULP_CABANG_FOUND';
     }
 
-    if (userCabangId && userCabangId !== 'UP3' && userCabangId !== 'c8690edf-123e-4d43-85b5-aa6bb3988e0b' && userCabangId !== 'NO_ULP_CABANG_FOUND') {
+    // For Super Admin (role === 'admin'), do NOT filter by cabang for lamaran, show all lamaran & pending
+    var isSuperAdmin = currentUser && currentUser.role === 'admin';
+
+    if (!isSuperAdmin && userCabangId && userCabangId !== 'UP3' && userCabangId !== 'c8690edf-123e-4d43-85b5-aa6bb3988e0b' && userCabangId !== 'NO_ULP_CABANG_FOUND') {
       var cabObj = SpreadsheetRepo.findOneBy('Cabang', 'id', userCabangId);
       var cabName = cabObj ? String(cabObj.nama_cabang || '').toLowerCase() : '';
 
@@ -41,7 +44,7 @@ var DashboardService = (function() {
       });
       lmr = lmr.filter(function(r) {
         var lCab = String(r.unit_pilihan || r.cabang || '').trim();
-        return lCab === userCabangId || (cabName && lCab.toLowerCase() === cabName);
+        return lCab === userCabangId || (cabName && lCab.toLowerCase() === cabName) || r.status === 'menunggu';
       });
       pmb = pmb.filter(function(r) {
         var pCab = String(r.cabang || '').trim();

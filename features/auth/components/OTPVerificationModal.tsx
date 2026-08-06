@@ -209,15 +209,23 @@ export function OTPVerificationModal({
           </Button>
         </div>
 
-        {/* Resend OTP Action */}
-        <div className="pt-2 border-t border-border flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">Tidak menerima kode?</span>
+        {/* Resend Action Footer */}
+        <div className="pt-2 flex items-center justify-between text-xs border-t border-border/50">
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={isResending}
+            className="text-muted-foreground hover:text-foreground hover:underline text-xs disabled:opacity-50"
+          >
+            Tidak menerima kode?
+          </button>
+
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={handleResend}
-            disabled={isResending || timeLeft > 240} // Allowed to resend after 1 min (when 4 mins left)
+            disabled={isResending}
             className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/40 h-8 disabled:opacity-50"
           >
             {isResending ? (

@@ -33,11 +33,15 @@ function TempPasswordDialog({
   onClose,
   nama,
   password,
+  email,
+  nomorHp,
 }: {
   open: boolean;
   onClose: () => void;
   nama: string;
   password: string;
+  email?: string;
+  nomorHp?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -45,6 +49,24 @@ function TempPasswordDialog({
     navigator.clipboard.writeText(password);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleOpenWA = () => {
+    let rawHp = String(nomorHp || "").replace(/[^0-9]/g, "");
+    if (rawHp.startsWith("0")) rawHp = "62" + rawHp.substring(1);
+    if (rawHp && !rawHp.startsWith("62")) rawHp = "62" + rawHp;
+
+    const text = `*AKUN ADMIN ULP PIJAR PLN UP3 PADANG*\n\n` +
+      `Halo *${nama}*,\nAkun Admin ULP Anda di sistem PIJAR telah resmi aktif.\n\n` +
+      `• Email Login: *${email || "-"}*\n` +
+      `• Password Sementara: *${password}*\n\n` +
+      `Silakan login ke aplikasi PIJAR dan ubah password Anda:\n` +
+      `https://pijar-magang.vercel.app/login`;
+
+    const waUrl = rawHp
+      ? `https://wa.me/${rawHp}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, "_blank");
   };
 
   return (
@@ -78,6 +100,13 @@ function TempPasswordDialog({
               }
             </Button>
           </div>
+          <Button
+            type="button"
+            onClick={handleOpenWA}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 text-xs"
+          >
+            Kirim Kredensial via WA Direct
+          </Button>
           <p className="text-xs text-muted-foreground bg-purple-500/10 border border-purple-500/20 rounded-lg px-3 py-2">
             Salin password ini sekarang. Pihak Admin ULP dapat mengubah password setelah login pertama.
           </p>
@@ -98,7 +127,7 @@ export function AdminUlpPage() {
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState<Pembimbing | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Pembimbing | null>(null);
-  const [tempPassword, setTempPassword] = useState<{ nama: string; password: string } | null>(null);
+  const [tempPassword, setTempPassword] = useState<{ nama: string; password: string; email?: string; nomorHp?: string } | null>(null);
 
   const debouncedSearch = useDebounce(search, 400);
 
@@ -151,7 +180,7 @@ export function AdminUlpPage() {
       if (!editTarget) {
         const tempPwd = (result as { temp_password?: string }).temp_password;
         if (tempPwd) {
-          setTempPassword({ nama: values.nama, password: tempPwd });
+          setTempPassword({ nama: values.nama, password: tempPwd, email: values.email, nomorHp: values.nomor_hp });
         } else {
           toast.success("Akun Admin ULP berhasil ditambahkan");
         }
@@ -414,6 +443,8 @@ export function AdminUlpPage() {
           onClose={() => setTempPassword(null)}
           nama={tempPassword.nama}
           password={tempPassword.password}
+          email={tempPassword.email}
+          nomorHp={tempPassword.nomorHp}
         />
       )}
     </div>

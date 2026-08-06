@@ -223,6 +223,7 @@ var AuthService = (function() {
       user_id:         currentUser.id,
       nama:            currentUser.nama,
       email:           currentUser.email,
+      nomor_hp:        currentUser.nomor_hp || params.nomor_hp || '',
       nim:             nim,
       universitas:     universitas,
       program_studi:   program_studi,

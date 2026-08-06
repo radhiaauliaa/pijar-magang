@@ -102,7 +102,9 @@ function ApproveModal({ lamaran, onClose, onSuccessOpenWA }: ApproveModalProps) 
         pembimbing: isUlpTransfer ? "Belum Ditentukan" : pembimbing,
         surat_penerimaan: suratFile || undefined,
       }),
-    onSuccess: () => {
+    onSuccess: (res) => {
+      onClose(); // Close modal immediately for fast UI response
+
       const selectedDivObj = (divisiList as Divisi[]).find((d) => d.id === divisi);
       const selectedPmbObj = pembimbingList.find((p) => p.id === pembimbing);
 
@@ -126,6 +128,8 @@ function ApproveModal({ lamaran, onClose, onSuccessOpenWA }: ApproveModalProps) 
       queryClient.invalidateQueries({ queryKey: ["lamaran"] });
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
 
+      const finalPdfUrl = (res as any)?.data?.surat_penerimaan_url || (res as any)?.surat_penerimaan_url || lamaran?.surat_penerimaan_url || "";
+
       // Email saat Lamaran Diterima / Didisposisikan
       if (lamaran?.email) {
         fetch("/api/email/send", {
@@ -140,9 +144,29 @@ function ApproveModal({ lamaran, onClose, onSuccessOpenWA }: ApproveModalProps) 
             unitName,
             divisiName,
             pembimbingName,
-            suratPenerimaanUrl: lamaran.surat_penerimaan_url,
+            suratPenerimaanUrl: finalPdfUrl,
           }),
         }).catch((e) => console.error("Failed to send acceptance email", e));
+      }
+
+      // Email Notifikasi ke Pembimbing Lapangan
+      if (!isUlpTransfer && selectedPmbObj && selectedPmbObj.email && lamaran) {
+        fetch("/api/email/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "pembimbing_student_assigned",
+            email: selectedPmbObj.email,
+            nama: selectedPmbObj.nama,
+            mhsNama: lamaran.nama,
+            mhsUniversitas: lamaran.universitas,
+            mhsProdi: lamaran.program_studi,
+            unitName,
+            divisiName,
+            tanggalMulai: lamaran.tanggal_mulai,
+            tanggalSelesai: lamaran.tanggal_selesai,
+          }),
+        }).catch((e) => console.error("Failed to send student assigned email to Pembimbing", e));
       }
 
       // Email Notifikasi Khusus ke Admin ULP Unit yang ditunjuk

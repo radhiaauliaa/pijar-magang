@@ -212,11 +212,17 @@ export function getLamaranAcceptedTemplate(
       </table>
     </div>
 
-    <div style="background-color: #ebf8ff; border: 1px dashed #2b6cb0; border-radius: 10px; padding: 18px; margin: 24px 0; text-align: center;">
-      <p style="margin: 0 0 6px 0; font-size: 15px; font-weight: 800; color: #2b6cb0;">📄 Surat Balasan Resmi Penerimaan Magang</p>
-      <p style="margin: 0 0 14px 0; font-size: 13px; color: #4a5568;">Berikut terlampir dokumen Surat Penerimaan Resmi dari PT PLN (Persero) UP3 Padang. Klik tombol di bawah ini untuk melihat/mengunduh surat Anda:</p>
-      <a href="${downloadLink}" class="btn-action" style="background-color: #2b6cb0; font-size: 14px;" target="_blank">📄 Unduh Surat Penerimaan (PDF)</a>
-    </div>
+    ${
+      suratPenerimaanUrl && suratPenerimaanUrl.trim()
+        ? `<div style="background-color: #ebf8ff; border: 1px dashed #2b6cb0; border-radius: 10px; padding: 18px; margin: 24px 0; text-align: center;">
+             <p style="margin: 0 0 6px 0; font-size: 15px; font-weight: 800; color: #2b6cb0;">📄 Surat Balasan Resmi Penerimaan Magang</p>
+             <p style="margin: 0 0 14px 0; font-size: 13px; color: #4a5568;">Berikut terlampir dokumen Surat Penerimaan Resmi dari PT PLN (Persero) UP3 Padang. Klik tombol di bawah ini untuk melihat/mengunduh surat Anda:</p>
+             <a href="${suratPenerimaanUrl}" class="btn-action" style="background-color: #2b6cb0; font-size: 14px;" target="_blank">📄 Unduh Surat Penerimaan (PDF)</a>
+           </div>`
+        : `<div style="background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin: 20px 0; text-align: center;">
+             <p style="margin: 0; font-size: 13px; color: #4a5568;">Dokumen Surat Penerimaan Resmi PDF Anda dapat diunduh melalui Dashboard Mahasiswa setelah Anda login.</p>
+           </div>`
+    }
 
     <p>Silakan login ke aplikasi <strong>PIJAR</strong> untuk mulai menggunakan seluruh fitur magang terpadu:</p>
     <ul style="padding-left: 20px; color: #4a5568;">
@@ -454,6 +460,66 @@ export function getUlpTransferNoticeTemplate({
 
     <div style="text-align: center; margin-top: 20px;">
       <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://pijar-magang.vercel.app"}/login" class="btn-action" target="_blank">Login ke Dashboard PIJAR</a>
+    </div>
+
+    <br>
+    <p style="margin-bottom: 0;">Salam,<br><strong>Tim PIJAR</strong><br>PT PLN (Persero) UP3 Padang</p>
+  `;
+
+  return { subject, html: getBaseWrapper({ title: subject, bodyContent }) };
+}
+
+// Template Notifikasi Mahasiswa Bimbingan Baru ke Pembimbing
+export function getNewStudentAssignedToPembimbingTemplate({
+  pembimbingNama,
+  mhsNama,
+  mhsUniversitas,
+  mhsProdi,
+  divisiName,
+  unitName,
+  tanggalMulai,
+  tanggalSelesai,
+}: {
+  pembimbingNama: string;
+  mhsNama: string;
+  mhsUniversitas: string;
+  mhsProdi: string;
+  divisiName?: string;
+  unitName?: string;
+  tanggalMulai?: string;
+  tanggalSelesai?: string;
+}): { subject: string; html: string } {
+  const subject = `[PIJAR] Mahasiswa Bimbingan Magang Baru: ${mhsNama}`;
+  const bodyContent = `
+    <p style="font-size: 16px; font-weight: 600; color: #2d3748;">Halo ${pembimbingNama},</p>
+    <p>Anda telah ditunjuk sebagai Pembimbing Lapangan untuk mahasiswa magang baru pada sistem <strong>PIJAR (PT PLN (Persero) UP3 Padang)</strong>.</p>
+    
+    <div class="info-card">
+      <p style="margin: 0 0 10px 0; font-weight: bold; color: #2d3748;">Detail Mahasiswa Bimbingan Anda:</p>
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr>
+          <td style="padding: 6px 0; color: #718096; width: 140px;">Nama Mahasiswa:</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${mhsNama}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #718096;">Kampus / Prodi:</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${mhsUniversitas} (${mhsProdi})</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #718096;">Unit & Divisi:</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #005BAC;">${unitName || "PT PLN UP3 Padang"} - ${divisiName || "Umum"}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #718096;">Periode Magang:</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #2d3748;">${tanggalMulai || "-"} s/d ${tanggalSelesai || "-"}</td>
+        </tr>
+      </table>
+    </div>
+
+    <p>Silakan login ke aplikasi <strong>PIJAR</strong> untuk memantau rekap absensi selfie GPS & memverifikasi laporan jurnal harian mahasiswa bimbingan Anda.</p>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://pijar-magang.vercel.app"}/login" class="btn-action" target="_blank">Login ke Dashboard Pembimbing</a>
     </div>
 
     <br>

@@ -41,14 +41,45 @@ export function generateOTP(email: string): string {
 }
 
 /**
- * Verify OTP code. Enforces 1-time use and 5-minute expiration window.
+ * Create a simple signed/encoded token payload for serverless fallback
+ */
+export function createOTPToken(email: string, code: string): string {
+  const normalizedEmail = email.toLowerCase().trim();
+  const expiresAt = Date.now() + 5 * 60 * 1000;
+  const payload = JSON.stringify({ email: normalizedEmail, code: code.trim(), expiresAt });
+  return Buffer.from(payload).toString("base64");
+}
+
+/**
+ * Verify OTP code using in-memory store with fallback to encoded token payload.
  */
 export function verifyOTP(
   email: string,
-  code: string
+  code: string,
+  backupToken?: string
 ): { success: boolean; message: string; reason?: "incorrect" | "expired" | "not_found" } {
   const normalizedEmail = email.toLowerCase().trim();
-  const record = otpMemoryStore.get(normalizedEmail);
+  const cleanCode = code.trim();
+
+  let record = otpMemoryStore.get(normalizedEmail);
+
+  // Fallback to backup token if serverless memory store lost the record across instances
+  if (!record && backupToken) {
+    try {
+      const decoded = JSON.parse(Buffer.from(backupToken, "base64").toString("utf-8"));
+      if (decoded.email === normalizedEmail) {
+        record = {
+          email: decoded.email,
+          code: decoded.code,
+          createdAt: decoded.expiresAt - 5 * 60 * 1000,
+          expiresAt: decoded.expiresAt,
+          isUsed: false,
+        };
+      }
+    } catch {
+      // Invalid backup token
+    }
+  }
 
   if (!record) {
     console.warn(`[OTP Store] No active OTP found for ${normalizedEmail}. Total active OTP keys:`, Array.from(otpMemoryStore.keys()));
@@ -76,7 +107,7 @@ export function verifyOTP(
     };
   }
 
-  if (record.code !== code.trim()) {
+  if (record.code !== cleanCode) {
     return {
       success: false,
       message: "Kode OTP salah.",

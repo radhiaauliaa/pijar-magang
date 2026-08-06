@@ -19,6 +19,22 @@ var LamaranService = (function() {
       return (b.created_at || '').localeCompare(a.created_at || '');
     });
 
+    var users = SpreadsheetRepo.getAll('Users');
+    var userMap = {};
+    for (var u = 0; u < users.length; u++) {
+      if (users[u].id) userMap[users[u].id] = users[u];
+      if (users[u].email) userMap[users[u].email.toLowerCase().trim()] = users[u];
+    }
+
+    for (var i = 0; i < rows.length; i++) {
+      if (!rows[i].nomor_hp) {
+        var usr = userMap[rows[i].user_id] || userMap[(rows[i].email || '').toLowerCase().trim()];
+        if (usr && usr.nomor_hp) {
+          rows[i].nomor_hp = usr.nomor_hp;
+        }
+      }
+    }
+
     var result = SpreadsheetRepo.paginate(rows, params.page || 1, params.limit || 100);
     return paginated(result.items, result.total, result.page, result.limit);
   }

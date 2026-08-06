@@ -156,6 +156,27 @@ export function MahasiswaForm({ defaultValues, onSuccess }: MahasiswaFormProps) 
           }),
         }).catch((e) => console.error("Failed to send update penempatan email", e));
 
+        // Also send email to Pembimbing if assigned
+        const pmbEmail = (assignedPmb as any)?.email;
+        if (assignedPmb && pmbEmail) {
+          fetch("/api/email/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: "pembimbing_student_assigned",
+              email: pmbEmail,
+              nama: assignedPmb.nama,
+              mhsNama: variables.nama,
+              mhsUniversitas: variables.universitas || "-",
+              mhsProdi: variables.program_studi || "-",
+              unitName,
+              divisiName,
+              tanggalMulai: variables.tanggal_mulai,
+              tanggalSelesai: variables.tanggal_selesai,
+            }),
+          }).catch((e) => console.error("Failed to send student assigned email to Pembimbing in ULP", e));
+        }
+
         dashboardService.pushNotification({
           title: isAdminUlp ? "Verifikasi Mahasiswa ULP Berhasil" : "Data Mahasiswa Diperbarui",
           message: `Data mahasiswa ${variables.nama} berhasil diverifikasi (Pembimbing: ${pembimbingName}).`,

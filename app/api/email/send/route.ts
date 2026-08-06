@@ -10,6 +10,7 @@ import {
   getAccountCreatedTemplate,
   getUpdatePenempatanTemplate,
   getUlpTransferNoticeTemplate,
+  getNewStudentAssignedToPembimbingTemplate,
 } from "@/lib/email-templates";
 import { addNotification } from "@/lib/notifications-store";
 
@@ -128,6 +129,22 @@ export async function POST(request: NextRequest) {
         notifTitle = "Akun PIJAR Dinonaktifkan";
         notifMessage = "Periode magang Anda telah selesai dan akun telah dinonaktifkan secara otomatis.";
         notifType = "status";
+        break;
+
+      case "pembimbing_student_assigned":
+        emailData = getNewStudentAssignedToPembimbingTemplate({
+          pembimbingNama: recipientName,
+          mhsNama: body.mhsNama || "Mahasiswa Baru",
+          mhsUniversitas: body.mhsUniversitas || "-",
+          mhsProdi: body.mhsProdi || "-",
+          divisiName,
+          unitName,
+          tanggalMulai,
+          tanggalSelesai,
+        });
+        notifTitle = "Mahasiswa Bimbingan Magang Baru";
+        notifMessage = `Anda ditunjuk sebagai Pembimbing Lapangan untuk ${body.mhsNama || "mahasiswa baru"}.`;
+        notifType = "info";
         break;
 
       default:

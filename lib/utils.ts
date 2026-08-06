@@ -100,9 +100,8 @@ export function getWhatsAppNotificationLink(options: {
   alasanTolak?: string;
 }): string {
   let rawHp = String(options.nomorHp || "").replace(/[^0-9]/g, "");
-  if (!rawHp) rawHp = "6282170366479";
   if (rawHp.startsWith("0")) rawHp = "62" + rawHp.substring(1);
-  if (!rawHp.startsWith("62")) rawHp = "62" + rawHp;
+  if (rawHp && !rawHp.startsWith("62")) rawHp = "62" + rawHp;
 
   let text = "";
   if (options.type === "diterima") {
