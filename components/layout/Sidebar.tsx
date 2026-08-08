@@ -15,6 +15,7 @@ import {
   GraduationCap,
   ClipboardList,
   ShieldCheck,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -56,6 +57,7 @@ const NAV_CONFIG: Record<Role, NavItem[]> = {
     { href: "/mahasiswa", label: "Dashboard", icon: LayoutDashboard },
     { href: "/mahasiswa/jurnal", label: "Jurnal Saya", icon: BookOpen },
     { href: "/mahasiswa/absensi", label: "Absensi", icon: Clock },
+    { href: "/mahasiswa/surat-penerimaan", label: "Surat Penerimaan", icon: FileText },
   ],
 };
 

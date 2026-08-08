@@ -128,7 +128,7 @@ function ApproveModal({ lamaran, onClose, onSuccessOpenWA }: ApproveModalProps) 
       queryClient.invalidateQueries({ queryKey: ["lamaran"] });
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
 
-      const finalPdfUrl = (res as any)?.data?.surat_penerimaan_url || (res as any)?.surat_penerimaan_url || lamaran?.surat_penerimaan_url || "";
+      const finalPdfUrl = res?.surat_penerimaan_url || (res as any)?.data?.surat_penerimaan_url || lamaran?.surat_penerimaan_url || "";
 
       // Email saat Lamaran Diterima / Didisposisikan
       if (lamaran?.email) {

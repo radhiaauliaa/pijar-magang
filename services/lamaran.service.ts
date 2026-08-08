@@ -27,7 +27,7 @@ export const lamaranService = {
     return res.data.data ?? EMPTY;
   },
 
-  async approve(data: ApproveLamaranRequest): Promise<void> {
+  async approve(data: ApproveLamaranRequest): Promise<{ surat_penerimaan_url?: string } | undefined> {
     let suratBase64 = "";
     let suratType = "";
 
@@ -38,7 +38,7 @@ export const lamaranService = {
       suratBase64 = data.surat_penerimaan;
     }
 
-    const res = await api.post<ApiResponse>("", {
+    const res = await api.post<ApiResponse<{ surat_penerimaan_url?: string }>>("", {
       action: "approveLamaran",
       id: data.id,
       divisi: data.divisi,
@@ -48,6 +48,7 @@ export const lamaranService = {
       surat_penerimaan_type: suratType,
     });
     if (!res.data.success) throw new Error(res.data.message);
+    return res.data.data;
   },
 
   async reject(data: RejectLamaranRequest): Promise<void> {

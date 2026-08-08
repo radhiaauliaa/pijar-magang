@@ -113,7 +113,7 @@ var LamaranService = (function() {
     }
 
     ActivityLogger.log(currentUser, 'Approve lamaran: ' + lamaran.nama + ' (' + lamaran.universitas + ')');
-    return success(null, 'Lamaran berhasil diterima. Mahasiswa sekarang aktif.');
+    return success({ surat_penerimaan_url: suratUrl, id: id }, 'Lamaran berhasil diterima. Mahasiswa sekarang aktif.');
   }
 
   // Reject
