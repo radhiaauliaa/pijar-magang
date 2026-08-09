@@ -245,6 +245,15 @@ export function getLamaranAcceptedTemplate(
       </table>
     </div>
 
+    <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; border-radius: 0 10px 10px 0; padding: 16px 20px; margin: 20px 0;">
+      <p style="margin: 0 0 8px 0; font-size: 15px; font-weight: 800; color: #15803d;">📌 Petunjuk Kehadiran Hari Pertama Magang:</p>
+      <ul style="margin: 0; padding-left: 18px; font-size: 14px; color: #166534; line-height: 1.6;">
+        <li style="margin-bottom: 6px;"><strong>Waktu Kehadiran:</strong> Hadir pada hari pertama magang (<strong>${fmtMulai}</strong>) pukul <strong>08:00 WIB</strong>.</li>
+        <li style="margin-bottom: 6px;"><strong>Pakaian / Seragam:</strong> Menggunakan kemeja putih dan celana/rok hitam (Hitam-Putih) rapi serta bersepatu.</li>
+        <li><strong>Lokasi Tujuan:</strong> Melapor ke Satpam / Resepsionis di kantor <strong>${unitName || "PT PLN (Persero) UP3 Padang"}</strong>.</li>
+      </ul>
+    </div>
+
     <div style="background-color: #ebf8ff; border: 1px dashed #2b6cb0; border-radius: 10px; padding: 18px; margin: 24px 0; text-align: center;">
       <p style="margin: 0 0 6px 0; font-size: 15px; font-weight: 800; color: #2b6cb0;">📄 Surat Balasan Resmi Penerimaan Magang</p>
       <p style="margin: 0 0 14px 0; font-size: 13px; color: #4a5568;">Berikut terlampir dokumen Surat Penerimaan Resmi dari PT PLN (Persero) UP3 Padang. Klik tombol di bawah ini untuk melihat/mengunduh surat Anda:</p>
